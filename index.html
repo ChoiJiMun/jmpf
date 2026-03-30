@@ -704,7 +704,35 @@ function updateThumbPreview() {
 }
 document.getElementById('fThumb').addEventListener('input', updateThumbPreview);
 
-// Image File Upload Handlers (Firebase Storage)
+// Image File Upload Handlers (Cloudinary)
+const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/ddhkzppo2/image/upload";
+const CLOUDINARY_UPLOAD_PRESET = "ml_default"; // 보통 기본으로 생성되는 unsigned 프리셋 이름입니다. 안 되면 수정이 필요할 수 있습니다.
+
+async function uploadToCloudinary(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+  try {
+    const response = await fetch(CLOUDINARY_URL, {
+      method: "POST",
+      body: formData
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Cloudinary error details:", errorData);
+      throw new Error(errorData.error?.message || "Upload failed");
+    }
+    
+    const data = await response.json();
+    return data.secure_url;
+  } catch (error) {
+    console.error("Error uploading to Cloudinary:", error);
+    throw error;
+  }
+}
+
 function handleImageUpload(fileInputId, urlInputId) {
   const fileInput = document.getElementById(fileInputId);
   const urlInput = document.getElementById(urlInputId);
@@ -713,31 +741,17 @@ function handleImageUpload(fileInputId, urlInputId) {
     const file = this.files[0];
     if (file) {
       try {
-        const storageRef = ref(storage, 'projects/' + file.name + '_' + Date.now());
-        const uploadTask = uploadBytesResumable(storageRef, file);
+        urlInput.value = '업로드 중... (Cloudinary)';
         
-        // 간단한 업로드 진행 상태 표시 (선택사항)
-        urlInput.value = '업로드 중...';
+        const downloadURL = await uploadToCloudinary(file);
         
-        uploadTask.on('state_changed', 
-          (snapshot) => {
-            // 진행률 표시 가능
-          }, 
-          (error) => {
-            console.error("Upload failed:", error);
-            alert("이미지 업로드에 실패했습니다.");
-            urlInput.value = '';
-          }, 
-          async () => {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            urlInput.value = downloadURL;
-            if (fileInputId === 'fThumbFile') {
-              updateThumbPreview();
-            }
-          }
-        );
+        urlInput.value = downloadURL;
+        if (fileInputId === 'fThumbFile') {
+          updateThumbPreview();
+        }
       } catch (error) {
-        console.error("Error uploading image:", error);
+        alert("이미지 업로드에 실패했습니다. Upload Preset 설정을 확인해주세요.");
+        urlInput.value = '';
       }
     }
   });
