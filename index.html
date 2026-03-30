@@ -287,36 +287,81 @@
   <div class="footer-copy">© 2026 FOLD Studio.<br>All rights reserved.</div>
 </footer>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAF4mQWQ8Ic9exTEjUe6Mqh_h8asOVXouU",
+  authDomain: "jimpf-portfolio.firebaseapp.com",
+  projectId: "jimpf-portfolio",
+  storageBucket: "jimpf-portfolio.firebasestorage.app",
+  messagingSenderId: "582573005559",
+  appId: "1:582573005559:web:aa4ce22c9b1aab2b08d1f2",
+  measurementId: "G-0R83M2GVLH"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
 /* ===================================================
-   DATA — localStorage
+   DATA — Firebase Firestore
 =================================================== */
-const STORAGE_KEY = 'fold_projects_v2';
+let localProjects = [];
 
-const DEFAULT_PROJECTS = [
-  { id:'p1', name:'Lumière Finance', tag:'Brand Identity', year:'2024', client:'Lumière Group', size:'large', color:'0',
-    shortDesc:'Complete rebrand for a pan-European fintech firm — identity, digital product, and motion system.',
-    desc:'Lumière Finance approached us for a complete brand overhaul ahead of their Series B funding round. The brief was clear: transform a legacy banking product into a trusted, modern fintech identity that could compete globally.\n\nWe developed a new visual language grounded in clarity and warmth — a departure from the cold precision typically associated with finance. The result was a comprehensive brand system including logo, typography, color palette, and motion guidelines, rolled out across web, mobile, and all marketing touchpoints.',
-    thumb:'', img1:'', img2:'', url:'' },
-  { id:'p2', name:'Vanta Studio', tag:'Web Experience', year:'2024', client:'Vanta Creative', size:'normal', color:'1',
-    shortDesc:'Immersive portfolio experience with WebGL-driven interactions and editorial motion design.',
-    desc:'Vanta is a Berlin-based production studio known for its avant-garde approach to commercial filmmaking. They needed a digital home that matched the ambition of their work.\n\nWe built a fully custom web experience featuring WebGL canvas effects, cursor-driven interactions, and a film-reel inspired navigation system. Every scroll triggers a new cinematic moment.',
-    thumb:'', img1:'', img2:'', url:'' },
-  { id:'p3', name:'Aura Health', tag:'Motion System', year:'2023', client:'Aura Technologies', size:'normal', color:'2',
-    shortDesc:'Motion language and design system for a next-gen wellness platform.',
-    desc:'Aura Health is building the future of preventive healthcare. Our role was to design a motion system that would unify their iOS, Android, and web products under a single, calming visual language.\n\nWe created 60+ Lottie animations, an icon motion library, and a transition system that guides users through complex health data without inducing anxiety.',
-    thumb:'', img1:'', img2:'', url:'' },
-  { id:'p4', name:'Maison Vert', tag:'E-commerce', year:'2023', client:'Maison Vert Paris', size:'normal', color:'3',
-    shortDesc:'Luxury botanical e-commerce with editorial storytelling and bespoke checkout experience.',
-    desc:'Maison Vert is a Paris-based luxury botanical skincare brand. Their existing Shopify store undercut the premium positioning of their products.\n\nWe redesigned the entire e-commerce experience — a custom Shopify theme featuring editorial product photography, story-driven collection pages, and a checkout flow that feels more like a private shopping appointment than a transactional form.',
-    thumb:'', img1:'', img2:'', url:'' },
-];
-
-function getProjects() {
-  try { const r = localStorage.getItem(STORAGE_KEY); if(r) return JSON.parse(r); } catch(e) {}
-  return JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
+async function getProjects() {
+  return localProjects;
 }
-function saveProjects(p) { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }
+
+async function fetchProjectsFromDB() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "projects"));
+    const projects = [];
+    querySnapshot.forEach((doc) => {
+      projects.push({ dbId: doc.id, ...doc.data() });
+    });
+    // 정렬: 생성 시간 역순 (가장 최근 등록이 맨 앞) 또는 원하는 기준
+    projects.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    localProjects = projects;
+    return projects;
+  } catch (e) {
+    console.error("Error fetching projects: ", e);
+    return [];
+  }
+}
+
+async function saveProjectToDB(data) {
+  try {
+    if (data.dbId) {
+      // Update
+      const docRef = doc(db, "projects", data.dbId);
+      const { dbId, ...updateData } = data;
+      await updateDoc(docRef, updateData);
+    } else {
+      // Add
+      data.createdAt = Date.now();
+      await addDoc(collection(db, "projects"), data);
+    }
+    await fetchProjectsFromDB(); // 갱신 후 리스트 다시 불러오기
+  } catch (e) {
+    console.error("Error saving project: ", e);
+    alert('저장 중 오류가 발생했습니다. 콘솔을 확인해주세요.');
+    throw e;
+  }
+}
+
+async function deleteProjectFromDB(dbId) {
+  try {
+    await deleteDoc(doc(db, "projects", dbId));
+    await fetchProjectsFromDB();
+  } catch (e) {
+    console.error("Error deleting project: ", e);
+    alert('삭제 중 오류가 발생했습니다.');
+  }
+}
+
 function genId() { return 'p' + Date.now(); }
 /* ===================================================
    SCROLL FX
@@ -363,8 +408,8 @@ const GRADS = ['#1a2d1a,#0d1a0d','#1a1a2d,#0d0d1a','#2d1a0a,#1a0d05','#0a1a2d,#0
 /* ===================================================
    RENDER PROJECT GRID
 =================================================== */
-function renderProjects() {
-  const projects = getProjects();
+async function renderProjects() {
+  const projects = await getProjects();
   const grid = document.getElementById('projectsGrid');
   grid.innerHTML = '';
 
@@ -576,8 +621,8 @@ document.getElementById('goAddBtn').addEventListener('click', () => {
   switchTab('add');
 });
 
-function renderAdminList() {
-  const projects = getProjects();
+async function renderAdminList() {
+  const projects = await getProjects();
   const list = document.getElementById('adminProjectList');
   list.innerHTML = '';
 
@@ -601,8 +646,8 @@ function renderAdminList() {
         <div class="project-row-tag">${p.tag}${p.year ? ' · ' + p.year : ''}${p.size === 'large' ? ' · LARGE' : ''}</div>
       </div>
       <div class="project-row-actions">
-        <button class="btn-edit" data-id="${p.id}">Edit</button>
-        <button class="btn-delete" data-id="${p.id}">Delete</button>
+        <button class="btn-edit" data-id="${p.dbId}">Edit</button>
+        <button class="btn-delete" data-id="${p.dbId}">Delete</button>
       </div>
     `;
     list.appendChild(row);
@@ -612,17 +657,18 @@ function renderAdminList() {
   list.querySelectorAll('.btn-delete').forEach(b => b.addEventListener('click', () => deleteProject(b.dataset.id)));
 }
 
-function deleteProject(id) {
+async function deleteProject(dbId) {
   if (!confirm('이 프로젝트를 삭제하시겠습니까?')) return;
-  saveProjects(getProjects().filter(p => p.id !== id));
-  renderAdminList();
+  await deleteProjectFromDB(dbId);
+  await renderAdminList();
   showToast('프로젝트가 삭제되었습니다');
 }
 
-function editProject(id) {
-  const p = getProjects().find(x => x.id === id);
+async function editProject(dbId) {
+  const projects = await getProjects();
+  const p = projects.find(x => x.dbId === dbId);
   if (!p) return;
-  document.getElementById('editId').value   = p.id;
+  document.getElementById('editId').value   = p.dbId;
   document.getElementById('fName').value    = p.name;
   document.getElementById('fTag').value     = p.tag;
   document.getElementById('fYear').value    = p.year || '';
@@ -658,22 +704,41 @@ function updateThumbPreview() {
 }
 document.getElementById('fThumb').addEventListener('input', updateThumbPreview);
 
-// Image File Upload Handlers (Base64 Encoding)
+// Image File Upload Handlers (Firebase Storage)
 function handleImageUpload(fileInputId, urlInputId) {
   const fileInput = document.getElementById(fileInputId);
   const urlInput = document.getElementById(urlInputId);
   
-  fileInput.addEventListener('change', function() {
+  fileInput.addEventListener('change', async function() {
     const file = this.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        urlInput.value = e.target.result; // Set Base64 string to URL input
-        if (fileInputId === 'fThumbFile') {
-          updateThumbPreview();
-        }
-      };
-      reader.readAsDataURL(file);
+      try {
+        const storageRef = ref(storage, 'projects/' + file.name + '_' + Date.now());
+        const uploadTask = uploadBytesResumable(storageRef, file);
+        
+        // 간단한 업로드 진행 상태 표시 (선택사항)
+        urlInput.value = '업로드 중...';
+        
+        uploadTask.on('state_changed', 
+          (snapshot) => {
+            // 진행률 표시 가능
+          }, 
+          (error) => {
+            console.error("Upload failed:", error);
+            alert("이미지 업로드에 실패했습니다.");
+            urlInput.value = '';
+          }, 
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            urlInput.value = downloadURL;
+            if (fileInputId === 'fThumbFile') {
+              updateThumbPreview();
+            }
+          }
+        );
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
     }
   });
 }
@@ -682,15 +747,14 @@ handleImageUpload('fThumbFile', 'fThumb');
 handleImageUpload('fImg1File', 'fImg1');
 handleImageUpload('fImg2File', 'fImg2');
 
-document.getElementById('saveBtn').addEventListener('click', () => {
+document.getElementById('saveBtn').addEventListener('click', async () => {
   const name = document.getElementById('fName').value.trim();
   const tag  = document.getElementById('fTag').value.trim();
   if (!name || !tag) { alert('프로젝트 이름과 카테고리는 필수입니다.'); return; }
 
-  const projects = getProjects();
   const editId = document.getElementById('editId').value;
   const data = {
-    id: editId || genId(), name, tag,
+    name, tag,
     year:      document.getElementById('fYear').value.trim(),
     client:    document.getElementById('fClient').value.trim(),
     size:      document.getElementById('fSize').value,
@@ -704,17 +768,27 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   };
 
   if (editId) {
-    const idx = projects.findIndex(p => p.id === editId);
-    if (idx > -1) projects[idx] = data; else projects.push(data);
-  } else {
-    projects.push(data);
+    data.dbId = editId;
   }
 
-  saveProjects(projects);
-  renderAdminList();
-  resetForm();
-  showToast(editId ? '✓ 프로젝트가 수정되었습니다' : '✓ 프로젝트가 추가되었습니다');
-  switchTab('projects');
+  // 저장 버튼 비활성화 (중복 클릭 방지)
+  const saveBtn = document.getElementById('saveBtn');
+  const originalText = saveBtn.textContent;
+  saveBtn.disabled = true;
+  saveBtn.textContent = '저장 중...';
+
+  try {
+    await saveProjectToDB(data);
+    await renderAdminList();
+    resetForm();
+    showToast(editId ? '✓ 프로젝트가 수정되었습니다' : '✓ 프로젝트가 추가되었습니다');
+    switchTab('projects');
+  } catch (e) {
+    // 에러 처리는 saveProjectToDB 내부에서 함
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalText;
+  }
 });
 
 document.getElementById('cancelEditBtn').addEventListener('click', () => {
@@ -730,7 +804,9 @@ document.addEventListener('keydown', e => {
 /* ===================================================
    INIT
 =================================================== */
-renderProjects();
+fetchProjectsFromDB().then(() => {
+  renderProjects();
+});
 </script>
 </body>
 </html>
