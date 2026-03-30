@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOLD — Digital Design Agency</title>
+<link href="https://fonts.googleapis.com/css2?family=Editorial+New:ital@0;1&family=Neue+Montreal:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:ital,wght@0,200;0,300;0,400;1,200&display=swap');
+
+  :root {
+    --bg: #0a0a08;
+    --fg: #f0ede6;
+    --accent: #c8f24d;
+    --muted: #3a3a36;
+    --warm: #d4a853;
+    --mid: #1a1a16;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 40px; height: 40px;
+    border: 1px solid rgba(200, 242, 77, 0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s ease, height 0.3s ease;
+  }
+  body:has(a:hover) .cursor, body:has(button:hover) .cursor {
+    width: 24px; height: 24px;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 48px;
+    mix-blend-mode: normal;
+  }
+
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    font-size: 18px;
+    letter-spacing: 0.08em;
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--fg);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 300;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  .nav-cta {
+    border: 1px solid rgba(240, 237, 230, 0.3);
+    padding: 10px 24px;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg);
+    text-decoration: none;
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
+    font-weight: 400;
+  }
+  .nav-cta:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 70% 40%, #1e2d0a 0%, transparent 60%),
+                radial-gradient(ellipse 40% 40% at 20% 70%, #0d1a05 0%, transparent 50%);
+  }
+
+  .hero-ticker {
+    position: absolute;
+    top: 50%;
+    right: -20px;
+    transform: translateY(-50%) rotate(90deg);
+    transform-origin: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(64px, 10vw, 140px);
+    line-height: 0.9;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    max-width: 900px;
+    margin-bottom: 64px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--warm);
+  }
+
+  .hero-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-sub {
+    max-width: 360px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(240, 237, 230, 0.55);
+    font-weight: 200;
+  }
+
+  .hero-scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: rgba(240, 237, 230, 0.3);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.1); }
+  }
+
+  /* MARQUEE */
+  .marquee-wrap {
+    border-top: 1px solid var(--muted);
+    border-bottom: 1px solid var(--muted);
+    padding: 20px 0;
+    overflow: hidden;
+    background: var(--mid);
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 0;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+
+  .marquee-track:hover { animation-play-state: paused; }
+
+  .marquee-item {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding-right: 40px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(240, 237, 230, 0.35);
+  }
+
+  .marquee-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* WORK SECTION */
+  section { padding: 120px 48px; }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 80px;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 5vw, 72px);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+  }
+
+  .section-title em { font-style: italic; color: var(--warm); }
+
+  .section-link {
+    color: var(--fg);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(240,237,230,0.3);
+    padding-bottom: 4px;
+    transition: border-color 0.2s, color 0.2s;
+    font-family: 'DM Mono', monospace;
+  }
+  .section-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* PROJECT GRID */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .project-card {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    background: var(--mid);
+    cursor: none;
+    group: true;
+  }
+
+  .project-card.large { grid-column: span 2; aspect-ratio: 16/7; }
+  .project-card.tall { aspect-ratio: 3/4; }
+
+  .project-bg {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .project-card:hover .project-bg { transform: scale(1.05); }
+
+  .proj-1 .project-bg { background: linear-gradient(135deg, #1a2d1a 0%, #0d1a0d 50%, #2a1a0a 100%); }
+  .proj-2 .project-bg { background: linear-gradient(135deg, #1a1a2d 0%, #0d0d1a 50%, #1a0d2d 100%); }
+  .proj-3 .project-bg { background: linear-gradient(135deg, #2d1a0a 0%, #1a0d05 50%, #2d2a0a 100%); }
+  .proj-4 .project-bg { background: linear-gradient(135deg, #0a1a2d 0%, #051015 100%); }
+
+  .proj-1 .project-visual { 
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .project-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 40px;
+    background: linear-gradient(to top, rgba(10,10,8,0.9) 0%, transparent 100%);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+
+  .project-card:hover .project-info {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .project-always {
+    position: absolute;
+    bottom: 40px; left: 40px;
+  }
+
+  .project-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .project-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 400;
+  }
+
+  .project-year {
+    position: absolute;
+    top: 32px; right: 32px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(240,237,230,0.3);
+    letter-spacing: 0.1em;
+  }
+
+  /* Decorative shapes in project cards */
+  .shape-circle {
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 1px solid rgba(200, 242, 77, 0.15);
+    position: absolute;
+  }
+  .shape-ring {
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    border: 1px solid rgba(212, 168, 83, 0.1);
+    position: absolute;
+  }
+  .shape-line {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(200, 242, 77, 0.3), transparent);
+    position: absolute;
+    width: 80%;
+  }
+
+  /* SERVICES */
+  .services-section { background: var(--mid); }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--muted);
+    border: 1px solid var(--muted);
+    margin-top: 80px;
+  }
+
+  .service-item {
+    background: var(--mid);
+    padding: 52px 40px;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .service-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(200,242,77,0.05) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .service-item:hover { background: #1f1f1a; }
+  .service-item:hover::before { opacity: 1; }
+
+  .service-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    margin-bottom: 32px;
+    display: block;
+  }
+
+  .service-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .service-desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(240, 237, 230, 0.45);
+    font-weight: 200;
+  }
+
+  .service-arrow {
+    position: absolute;
+    bottom: 40px; right: 40px;
+    font-size: 20px;
+    color: rgba(240,237,230,0.2);
+    transition: color 0.3s, transform 0.3s;
+  }
+  .service-item:hover .service-arrow { color: var(--accent); transform: translate(4px, -4px); }
+
+  /* ABOUT STRIP */
+  .about-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 120px;
+    align-items: center;
+    padding: 120px 48px;
+  }
+
+  .about-left .big-num {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(80px, 14vw, 180px);
+    font-weight: 400;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(240,237,230,0.15);
+    line-height: 1;
+    margin-bottom: -20px;
+  }
+
+  .about-left .about-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-left: 4px;
+  }
+
+  .about-right p {
+    font-size: 18px;
+    line-height: 1.7;
+    color: rgba(240, 237, 230, 0.7);
+    margin-bottom: 24px;
+    font-weight: 200;
+  }
+
+  .about-right p strong {
+    color: var(--fg);
+    font-weight: 400;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 48px;
+    margin-top: 48px;
+    padding-top: 48px;
+    border-top: 1px solid var(--muted);
+  }
+
+  .stat-item {}
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 40px;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-size: 12px;
+    color: rgba(240,237,230,0.4);
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+
+  /* CLIENTS */
+  .clients-section { border-top: 1px solid var(--muted); }
+
+  .clients-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--muted);
+    border: 1px solid var(--muted);
+    margin-top: 60px;
+  }
+
+  .client-item {
+    background: var(--bg);
+    padding: 40px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .client-item:hover { background: var(--mid); }
+
+  .client-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: rgba(240,237,230,0.25);
+    font-style: italic;
+    transition: color 0.2s;
+    text-align: center;
+  }
+
+  .client-item:hover .client-name { color: rgba(240,237,230,0.6); }
+
+  /* CTA SECTION */
+  .cta-section {
+    text-align: center;
+    padding: 160px 48px;
+    background: var(--mid);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,242,77,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+  }
+
+  .cta-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 8vw, 112px);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 64px;
+  }
+
+  .cta-title em { font-style: italic; color: var(--warm); }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--accent);
+    color: var(--bg);
+    padding: 20px 48px;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+    transition: transform 0.2s, gap 0.2s;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .cta-btn:hover { transform: translateY(-2px); gap: 24px; }
+
+  /* FOOTER */
+  footer {
+    padding: 60px 48px;
+    border-top: 1px solid var(--muted);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    align-items: end;
+  }
+
+  .footer-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  .footer-tagline {
+    font-size: 13px;
+    color: rgba(240,237,230,0.35);
+    font-weight: 200;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    list-style: none;
+  }
+
+  .footer-links a {
+    color: rgba(240,237,230,0.4);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+    letter-spacing: 0.06em;
+  }
+  .footer-links a:hover { color: var(--fg); }
+
+  .footer-right {
+    text-align: right;
+  }
+
+  .footer-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(240,237,230,0.2);
+    letter-spacing: 0.1em;
+  }
+
+  /* ANIMATIONS */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .delay-1 { transition-delay: 0.1s; }
+  .delay-2 { transition-delay: 0.2s; }
+  .delay-3 { transition-delay: 0.3s; }
+  .delay-4 { transition-delay: 0.4s; }
+
+  /* SVG DECORATIONS IN CARDS */
+  .proj-deco {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">FOLD™</a>
+  <ul class="nav-links">
+    <li><a href="#">Work</a></li>
+    <li><a href="#">Studio</a></li>
+    <li><a href="#">Services</a></li>
+    <li><a href="#">Journal</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get in touch</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  
+  <div class="hero-ticker">Crafting digital experiences — Est. 2018 — Seoul × Amsterdam</div>
+
+  <div class="hero-eyebrow fade-up visible">Creative Digital Studio</div>
+
+  <h1 class="hero-title fade-up visible delay-1">
+    We shape<br>
+    <em>brands</em> that<br>
+    move the world
+  </h1>
+
+  <div class="hero-bottom">
+    <p class="hero-sub fade-up visible delay-2">
+      A multidisciplinary design studio specializing in brand identity, digital experiences, and motion — built for the curious and the bold.
+    </p>
+    <div class="hero-scroll fade-up visible delay-3">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="marquee-dot"></span>Brand Strategy</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Web Design</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Motion Direction</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>UI/UX Design</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Digital Identity</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Creative Direction</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Brand Strategy</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Web Design</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Motion Direction</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>UI/UX Design</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Digital Identity</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Creative Direction</div>
+  </div>
+</div>
+
+<!-- WORK -->
+<section>
+  <div class="section-header">
+    <div>
+      <div class="section-label fade-up">Selected Work</div>
+      <h2 class="section-title fade-up delay-1">Projects that<br>define <em>eras</em></h2>
+    </div>
+    <a href="#" class="section-link fade-up delay-2">View all work</a>
+  </div>
+
+  <div class="projects-grid">
+    <!-- Project 1: Large -->
+    <div class="project-card large proj-1 fade-up">
+      <div class="project-bg"></div>
+      <div class="proj-deco">
+        <svg width="400" height="200" viewBox="0 0 400 200">
+          <circle cx="200" cy="100" r="80" fill="none" stroke="rgba(200,242,77,0.12)" stroke-width="1"/>
+          <circle cx="200" cy="100" r="120" fill="none" stroke="rgba(200,242,77,0.07)" stroke-width="1"/>
+          <circle cx="200" cy="100" r="160" fill="none" stroke="rgba(200,242,77,0.04)" stroke-width="1"/>
+          <line x1="0" y1="100" x2="400" y2="100" stroke="rgba(200,242,77,0.1)" stroke-width="0.5"/>
+          <line x1="200" y1="0" x2="200" y2="200" stroke="rgba(200,242,77,0.1)" stroke-width="0.5"/>
+        </svg>
+      </div>
+      <span class="project-year">2024</span>
+      <div class="project-always">
+        <div class="project-tag">Brand Identity</div>
+        <div class="project-name">Lumière Finance</div>
+      </div>
+      <div class="project-info">
+        <p style="font-size:13px;color:rgba(240,237,230,0.6);line-height:1.6;margin-top:12px;">Complete rebrand for a pan-European fintech firm — identity, digital product, and motion system.</p>
+      </div>
+    </div>
+
+    <!-- Project 2 -->
+    <div class="project-card proj-2 fade-up delay-1">
+      <div class="project-bg"></div>
+      <div class="proj-deco">
+        <svg width="220" height="220" viewBox="0 0 220 220">
+          <rect x="40" y="40" width="140" height="140" fill="none" stroke="rgba(212,168,83,0.15)" stroke-width="1" transform="rotate(15 110 110)"/>
+          <rect x="60" y="60" width="100" height="100" fill="none" stroke="rgba(212,168,83,0.1)" stroke-width="1" transform="rotate(30 110 110)"/>
+          <rect x="80" y="80" width="60" height="60" fill="rgba(212,168,83,0.05)" stroke="rgba(212,168,83,0.2)" stroke-width="1" transform="rotate(45 110 110)"/>
+        </svg>
+      </div>
+      <span class="project-year">2024</span>
+      <div class="project-always">
+        <div class="project-tag">Web Experience</div>
+        <div class="project-name">Vanta Studio</div>
+      </div>
+      <div class="project-info">
+        <p style="font-size:13px;color:rgba(240,237,230,0.6);line-height:1.6;margin-top:12px;">Immersive portfolio experience with WebGL-driven interactions and editorial motion design.</p>
+      </div>
+    </div>
+
+    <!-- Project 3 -->
+    <div class="project-card proj-3 fade-up delay-2">
+      <div class="project-bg"></div>
+      <div class="proj-deco">
+        <svg width="220" height="220" viewBox="0 0 220 220">
+          <polygon points="110,20 200,170 20,170" fill="none" stroke="rgba(200,242,77,0.12)" stroke-width="1"/>
+          <polygon points="110,50 180,160 40,160" fill="none" stroke="rgba(200,242,77,0.08)" stroke-width="1"/>
+          <polygon points="110,80 160,150 60,150" fill="rgba(200,242,77,0.03)" stroke="rgba(200,242,77,0.15)" stroke-width="1"/>
+        </svg>
+      </div>
+      <span class="project-year">2023</span>
+      <div class="project-always">
+        <div class="project-tag">Motion System</div>
+        <div class="project-name">Aura Health</div>
+      </div>
+      <div class="project-info">
+        <p style="font-size:13px;color:rgba(240,237,230,0.6);line-height:1.6;margin-top:12px;">Motion language and design system for a next-gen wellness platform.</p>
+      </div>
+    </div>
+
+    <!-- Project 4 -->
+    <div class="project-card proj-4 fade-up delay-3">
+      <div class="project-bg"></div>
+      <div class="proj-deco">
+        <svg width="220" height="220" viewBox="0 0 220 220">
+          <path d="M 20 110 Q 110 20 200 110 Q 110 200 20 110 Z" fill="none" stroke="rgba(212,168,83,0.15)" stroke-width="1"/>
+          <path d="M 50 110 Q 110 50 170 110 Q 110 170 50 110 Z" fill="rgba(212,168,83,0.04)" stroke="rgba(212,168,83,0.2)" stroke-width="1"/>
+        </svg>
+      </div>
+      <span class="project-year">2023</span>
+      <div class="project-always">
+        <div class="project-tag">E-commerce</div>
+        <div class="project-name">Maison Vert</div>
+      </div>
+      <div class="project-info">
+        <p style="font-size:13px;color:rgba(240,237,230,0.6);line-height:1.6;margin-top:12px;">Luxury botanical e-commerce with editorial storytelling and bespoke checkout experience.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services-section">
+  <div class="section-header">
+    <div>
+      <div class="section-label fade-up">What We Do</div>
+      <h2 class="section-title fade-up delay-1">Capabilities &<br><em>Craft</em></h2>
+    </div>
+  </div>
+
+  <div class="services-grid">
+    <div class="service-item fade-up">
+      <span class="service-num">01</span>
+      <h3 class="service-name">Brand<br>Identity</h3>
+      <p class="service-desc">Strategic positioning, visual identity systems, and brand narratives that resonate across every touchpoint.</p>
+      <span class="service-arrow">↗</span>
+    </div>
+    <div class="service-item fade-up delay-1">
+      <span class="service-num">02</span>
+      <h3 class="service-name">Digital<br>Experience</h3>
+      <p class="service-desc">Websites, web apps, and digital products designed with precision — from concept to production-ready code.</p>
+      <span class="service-arrow">↗</span>
+    </div>
+    <div class="service-item fade-up delay-2">
+      <span class="service-num">03</span>
+      <h3 class="service-name">Motion<br>Direction</h3>
+      <p class="service-desc">Animation systems, Lottie motion, and cinematic micro-interactions that breathe life into interfaces.</p>
+      <span class="service-arrow">↗</span>
+    </div>
+    <div class="service-item fade-up">
+      <span class="service-num">04</span>
+      <h3 class="service-name">Creative<br>Direction</h3>
+      <p class="service-desc">Art direction, campaign concepts, and visual language development for campaigns that cut through noise.</p>
+      <span class="service-arrow">↗</span>
+    </div>
+    <div class="service-item fade-up delay-1">
+      <span class="service-num">05</span>
+      <h3 class="service-name">UI/UX<br>Design</h3>
+      <p class="service-desc">User research, interaction design, and design systems for products that feel intuitive and delightful.</p>
+      <span class="service-arrow">↗</span>
+    </div>
+    <div class="service-item fade-up delay-2">
+      <span class="service-num">06</span>
+      <h3 class="service-name">Front-end<br>Development</h3>
+      <p class="service-desc">React, Next.js, and component-based development that bridges the gap between design vision and live product.</p>
+      <span class="service-arrow">↗</span>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT STRIP -->
+<div class="about-strip">
+  <div class="about-left fade-up">
+    <div class="big-num">08</div>
+    <div class="about-sub">Years of practice</div>
+  </div>
+  <div class="about-right">
+    <p>FOLD is a <strong>Seoul-based creative studio</strong> working at the intersection of strategy, design, and technology. We believe the best digital work comes from deep collaboration — between disciplines, between cultures, between the rational and the intuitive.</p>
+    <p>We work with startups finding their voice and established brands reinventing themselves. Every engagement is a partnership built on trust, craft, and the shared pursuit of work that <strong>actually matters</strong>.</p>
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-num">120+</div>
+        <div class="stat-label">Projects delivered</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">18</div>
+        <div class="stat-label">Countries reached</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">96%</div>
+        <div class="stat-label">Repeat clients</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENTS -->
+<section class="clients-section">
+  <div class="section-label fade-up">Trusted By</div>
+  <div class="clients-grid">
+    <div class="client-item"><span class="client-name">Naver</span></div>
+    <div class="client-item"><span class="client-name">Kakao</span></div>
+    <div class="client-item"><span class="client-name">Krafton</span></div>
+    <div class="client-item"><span class="client-name">Hyundai</span></div>
+    <div class="client-item"><span class="client-name">Samsung</span></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <div class="cta-eyebrow fade-up">Ready when you are</div>
+  <h2 class="cta-title fade-up delay-1">
+    Let's build<br>
+    something <em>iconic</em><br>
+    together
+  </h2>
+  <a href="mailto:hello@fold.studio" class="cta-btn fade-up delay-2">
+    Start a Project
+    <span>→</span>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">FOLD™</div>
+    <div class="footer-tagline">Design Studio — Seoul, KR</div>
+  </div>
+  <ul class="footer-links">
+    <li><a href="#">Instagram</a></li>
+    <li><a href="#">Behance</a></li>
+    <li><a href="#">LinkedIn</a></li>
+    <li><a href="#">Dribbble</a></li>
+  </ul>
+  <div class="footer-right">
+    <div class="footer-copy">© 2026 FOLD Studio.<br>All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  // CURSOR
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    setTimeout(() => {
+      ring.style.left = e.clientX + 'px';
+      ring.style.top = e.clientY + 'px';
+    }, 80);
+  });
+
+  // SCROLL ANIMATIONS
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // NAV background on scroll
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 80) {
+      nav.style.background = 'rgba(10,10,8,0.9)';
+      nav.style.backdropFilter = 'blur(16px)';
+      nav.style.borderBottom = '1px solid rgba(58,58,54,0.4)';
+    } else {
+      nav.style.background = 'transparent';
+      nav.style.backdropFilter = 'none';
+      nav.style.borderBottom = 'none';
+    }
+  });
+
+  // Hero title word split animation
+  document.querySelectorAll('.hero-title').forEach(el => {
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+  });
+
+  // Parallax on hero
+  window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const hero = document.querySelector('.hero-title');
+    if (hero) {
+      hero.style.transform = `translateY(${scrolled * 0.15}px)`;
+    }
+  });
+</script>
+</body>
+</html>
