@@ -180,11 +180,14 @@
 <!-- ==================== MAIN SITE ==================== -->
 <nav id="mainNav">
   <a href="#" class="nav-logo" id="navLogo">ClassicGraphics™</a>
-  <ul class="nav-links">
+  <button class="menu-toggle" id="menuToggle">☰</button>
+  <ul class="nav-links" id="navLinks">
     <li><a href="#">Work</a></li>
     <li><a href="#">Studio</a></li>
     <li><a href="#">Services</a></li>
     <li><a href="#">Journal</a></li>
+    <!-- 모바일에서만 보일 수 있도록 클래스 조정 등을 할 수 있지만, 일단은 기존 링크에 통합 -->
+    <li><a href="#contact" style="color:var(--accent);">Get in touch</a></li>
   </ul>
   <a href="#contact" class="nav-cta">Get in touch</a>
 </nav>
@@ -814,6 +817,29 @@ document.getElementById('cancelEditBtn').addEventListener('click', () => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closePopup(); closePwModal(); }
 });
+
+/* ===================================================
+   MOBILE MENU TOGGLE
+=================================================== */
+const menuToggle = document.getElementById('menuToggle');
+const navLinks = document.getElementById('navLinks');
+
+if (menuToggle && navLinks) {
+  menuToggle.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+    menuToggle.textContent = navLinks.classList.contains('open') ? '✕' : '☰';
+  });
+
+  // 모바일 메뉴 링크 클릭 시 메뉴 닫기
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        navLinks.classList.remove('open');
+        menuToggle.textContent = '☰';
+      }
+    });
+  });
+}
 
 /* ===================================================
    INIT
