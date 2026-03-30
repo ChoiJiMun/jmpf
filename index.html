@@ -117,18 +117,21 @@
           </div>
           <div class="form-row">
             <label class="form-label">Thumbnail Image URL (메인 카드 + 팝업 상단)</label>
-            <input class="form-input" id="fThumb" placeholder="https://images.unsplash.com/photo-xxxx?w=1200">
-            <p class="form-hint">Unsplash, Imgur 등 외부 이미지 URL을 붙여넣으세요. 비워두면 컬러 그라디언트가 사용됩니다.</p>
+            <input class="form-input" id="fThumb" placeholder="이미지 파일을 선택하거나 URL을 입력하세요.">
+            <input type="file" id="fThumbFile" accept="image/*" style="margin-top: 10px;">
+            <p class="form-hint">이미지 파일을 선택하면 자동으로 업로드됩니다. 비워두면 컬러 그라디언트가 사용됩니다.</p>
             <div class="form-image-preview" id="thumbPreview"><span>No Image — Preview Here</span></div>
           </div>
           <div class="form-grid">
             <div class="form-row">
               <label class="form-label">Gallery Image 1 (popup, optional)</label>
               <input class="form-input" id="fImg1" placeholder="https://...">
+              <input type="file" id="fImg1File" accept="image/*" style="margin-top: 10px;">
             </div>
             <div class="form-row">
               <label class="form-label">Gallery Image 2 (popup, optional)</label>
               <input class="form-input" id="fImg2" placeholder="https://...">
+              <input type="file" id="fImg2File" accept="image/*" style="margin-top: 10px;">
             </div>
           </div>
           <div class="form-row">
@@ -176,7 +179,7 @@
 
 <!-- ==================== MAIN SITE ==================== -->
 <nav id="mainNav">
-  <a href="#" class="nav-logo" id="navLogo">FOLD™</a>
+  <a href="#" class="nav-logo" id="navLogo">ClassicGraphics™</a>
   <ul class="nav-links">
     <li><a href="#">Work</a></li>
     <li><a href="#">Studio</a></li>
@@ -641,6 +644,7 @@ function editProject(id) {
 function resetForm() {
   document.getElementById('editId').value = '';
   ['fName','fTag','fYear','fClient','fShortDesc','fDesc','fThumb','fImg1','fImg2','fUrl'].forEach(id => document.getElementById(id).value = '');
+  ['fThumbFile','fImg1File','fImg2File'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('fSize').value = 'normal';
   document.getElementById('fColor').value = '0';
   updateThumbPreview();
@@ -653,6 +657,30 @@ function updateThumbPreview() {
   else { prev.style.backgroundImage = ''; prev.innerHTML = '<span>No Image — Preview Here</span>'; }
 }
 document.getElementById('fThumb').addEventListener('input', updateThumbPreview);
+
+// Image File Upload Handlers (Base64 Encoding)
+function handleImageUpload(fileInputId, urlInputId) {
+  const fileInput = document.getElementById(fileInputId);
+  const urlInput = document.getElementById(urlInputId);
+  
+  fileInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        urlInput.value = e.target.result; // Set Base64 string to URL input
+        if (fileInputId === 'fThumbFile') {
+          updateThumbPreview();
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+handleImageUpload('fThumbFile', 'fThumb');
+handleImageUpload('fImg1File', 'fImg1');
+handleImageUpload('fImg2File', 'fImg2');
 
 document.getElementById('saveBtn').addEventListener('click', () => {
   const name = document.getElementById('fName').value.trim();
