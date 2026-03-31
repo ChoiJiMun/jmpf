@@ -43,9 +43,6 @@
 <div class="popup-overlay" id="popupOverlay">
   <div class="popup-panel" id="popupPanel">
     <button class="popup-close" id="popupClose">×</button>
-    <div class="popup-hero" id="popupHero">
-      <div class="popup-hero-deco" id="popupHeroDeco"></div>
-    </div>
     <div class="popup-body">
       <div class="popup-meta">
         <div class="popup-meta-label">Category</div>
@@ -343,21 +340,6 @@ async function renderProjects() {
 =================================================== */
 function openPopup(p) {
   const overlay = document.getElementById('popupOverlay');
-  const hero    = document.getElementById('popupHero');
-  const deco    = document.getElementById('popupHeroDeco');
-  const ci      = parseInt(p.color) % 6;
-
-  if (p.thumb) {
-    hero.style.backgroundImage = `url('${p.thumb}')`;
-    hero.style.backgroundSize  = 'cover';
-    const [c1, c2] = GRADS[ci].split(',');
-    hero.style.background = `linear-gradient(to bottom, transparent 40%, rgba(26,26,22,.8) 100%), url('${p.thumb}') center/cover`;
-    deco.innerHTML = '';
-  } else {
-    const [c1, c2] = GRADS[ci].split(',');
-    hero.style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
-    deco.innerHTML = DECOS[ci];
-  }
 
   document.getElementById('pmTag').textContent    = p.tag;
   document.getElementById('pmYear').textContent   = p.year || '—';
