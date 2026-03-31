@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FOLD — Digital Design Agency</title>
+<title>ChoiJM™ — Digital Design Agency</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -39,116 +39,6 @@
   </div>
 </div>
 
-<!-- ==================== ADMIN PANEL ==================== -->
-<div class="admin-overlay" id="adminOverlay">
-  <div class="admin-header">
-    <div class="admin-logo">ClassicGraphics™ <span>/ Admin Dashboard</span></div>
-    <button class="admin-exit" id="adminExit">← Exit to Site</button>
-  </div>
-  <div class="admin-body">
-    <div class="admin-sidebar">
-      <div class="admin-sidebar-title">Menu</div>
-      <a class="admin-nav-item active" data-tab="projects" href="#">📁  Projects</a>
-      <a class="admin-nav-item" data-tab="add" href="#">＋  Add Project</a>
-    </div>
-    <div class="admin-main">
-
-      <!-- Projects List Tab -->
-      <div class="admin-tab active" id="tab-projects">
-        <div class="admin-section-title">All Projects</div>
-        <div class="admin-section-sub">프로젝트를 편집하거나 삭제하세요. 순서는 등록 순서대로 표시됩니다.</div>
-        <div class="project-list" id="adminProjectList"></div>
-        <button class="btn-primary" id="goAddBtn">+ Add New Project</button>
-      </div>
-
-      <!-- Add / Edit Tab -->
-      <div class="admin-tab" id="tab-add">
-        <div class="admin-section-title" id="formTitle">Add Project</div>
-        <div class="admin-section-sub" id="formSub">프로젝트 정보를 입력하세요. 이미지 URL을 입력하면 썸네일 팝업에 표시됩니다.</div>
-        <div class="admin-form">
-          <input type="hidden" id="editId">
-          <div class="form-grid">
-            <div class="form-row">
-              <label class="form-label">Project Name *</label>
-              <input class="form-input" id="fName" placeholder="e.g. Lumière Finance">
-            </div>
-            <div class="form-row">
-              <label class="form-label">Category / Tag *</label>
-              <input class="form-input" id="fTag" placeholder="e.g. Brand Identity">
-            </div>
-          </div>
-          <div class="form-grid">
-            <div class="form-row">
-              <label class="form-label">Year</label>
-              <input class="form-input" id="fYear" placeholder="2024">
-            </div>
-            <div class="form-row">
-              <label class="form-label">Client / Company</label>
-              <input class="form-input" id="fClient" placeholder="e.g. Acme Corp">
-            </div>
-          </div>
-          <div class="form-grid">
-            <div class="form-row">
-              <label class="form-label">Grid Size</label>
-              <select class="form-select" id="fSize">
-                <option value="normal">Normal — Half Width</option>
-                <option value="large">Large — Full Width</option>
-              </select>
-            </div>
-            <div class="form-row">
-              <label class="form-label">Card Color Theme</label>
-              <select class="form-select" id="fColor">
-                <option value="0">🌿 Forest Green</option>
-                <option value="1">🌌 Deep Violet</option>
-                <option value="2">🍂 Amber Dark</option>
-                <option value="3">🌊 Ocean Blue</option>
-                <option value="4">🌹 Crimson</option>
-                <option value="5">💚 Emerald</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <label class="form-label">Short Description (card hover text)</label>
-            <input class="form-input" id="fShortDesc" placeholder="카드 호버 시 보여지는 한 줄 설명...">
-          </div>
-          <div class="form-row">
-            <label class="form-label">Full Description (popup body)</label>
-            <textarea class="form-textarea" id="fDesc" placeholder="팝업에서 보여지는 상세 설명입니다. 줄바꿈을 사용하면 그대로 표시됩니다.&#10;&#10;클라이언트 배경, 우리의 역할, 결과물을 자유롭게 적어보세요."></textarea>
-          </div>
-          <div class="form-row">
-            <label class="form-label">Thumbnail Image URL (메인 카드 + 팝업 상단)</label>
-            <input class="form-input" id="fThumb" placeholder="이미지 파일을 선택하거나 URL을 입력하세요.">
-            <input type="file" id="fThumbFile" accept="image/*" style="margin-top: 10px;">
-            <p class="form-hint">이미지 파일을 선택하면 자동으로 업로드됩니다. 비워두면 컬러 그라디언트가 사용됩니다.</p>
-            <div class="form-image-preview" id="thumbPreview"><span>No Image — Preview Here</span></div>
-          </div>
-          <div class="form-grid">
-            <div class="form-row">
-              <label class="form-label">Gallery Image 1 (popup, optional)</label>
-              <input class="form-input" id="fImg1" placeholder="https://...">
-              <input type="file" id="fImg1File" accept="image/*" style="margin-top: 10px;">
-            </div>
-            <div class="form-row">
-              <label class="form-label">Gallery Image 2 (popup, optional)</label>
-              <input class="form-input" id="fImg2" placeholder="https://...">
-              <input type="file" id="fImg2File" accept="image/*" style="margin-top: 10px;">
-            </div>
-          </div>
-          <div class="form-row">
-            <label class="form-label">Project URL (optional)</label>
-            <input class="form-input" id="fUrl" placeholder="https://...">
-          </div>
-          <div class="form-actions">
-            <button class="btn-primary" id="saveBtn">💾  Save Project</button>
-            <button class="btn-secondary" id="cancelEditBtn">Cancel</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
 <!-- ==================== PROJECT POPUP ==================== -->
 <div class="popup-overlay" id="popupOverlay">
   <div class="popup-panel" id="popupPanel">
@@ -177,15 +67,42 @@
   </div>
 </div>
 
+<!-- ==================== ABOUT POPUP ==================== -->
+<div class="about-overlay" id="aboutOverlay">
+  <div class="about-panel" id="aboutPanel">
+    <button class="about-close" id="aboutClose">×</button>
+    <div class="about-content" id="aboutContentDisplay">
+      <h2>About Me</h2>
+      <p>Hello! I'm a passionate Digital Designer & Publisher based in Seoul. I specialize in creating visually stunning and highly functional digital experiences.</p>
+      
+      <h3>Experience</h3>
+      <ul>
+        <li><strong>Senior Designer</strong> at FOLD Studio (2021 - Present)</li>
+        <li><strong>UI/UX Designer</strong> at Creative Agency (2018 - 2021)</li>
+      </ul>
+      
+      <h3>Skills</h3>
+      <ul>
+        <li>UI/UX Design, Web Publishing, Branding, Motion Graphics</li>
+        <li>Figma, Adobe Creative Suite, HTML/CSS, JavaScript</li>
+      </ul>
+      
+      <h3>Education</h3>
+      <ul>
+        <li>BA in Visual Communication Design (2018)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== MAIN SITE ==================== -->
 <nav id="mainNav">
   <a href="#" class="nav-logo" id="navLogo">ClassicGraphics™</a>
   <button class="menu-toggle" id="menuToggle">☰</button>
   <ul class="nav-links" id="navLinks">
-    <li><a href="#">Work</a></li>
-    <li><a href="#">Studio</a></li>
-    <li><a href="#">Services</a></li>
-    <li><a href="#">Journal</a></li>
+    <li><a href="#" id="navAbout">About</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#contact">Contact</a></li>
     <!-- 모바일에서만 보일 수 있도록 클래스 조정 등을 할 수 있지만, 일단은 기존 링크에 통합 -->
     <li><a href="#contact" style="color:var(--accent);">Get in touch</a></li>
   </ul>
@@ -220,7 +137,7 @@
   </div>
 </div>
 
-<section>
+<section id="work">
   <div class="section-header">
     <div>
       <div class="section-label fade-up">Selected Work</div>
@@ -278,7 +195,7 @@
 <section class="cta-section" id="contact">
   <div class="cta-eyebrow fade-up">Ready when you are</div>
   <h2 class="cta-title fade-up delay-1">Let's build<br>something <em>iconic</em><br>together</h2>
-  <a href="mailto:hello@fold.studio" class="cta-btn fade-up delay-2">Start a Project <span>→</span></a>
+  <a href="mailto:choiyt0810@gmail.com" class="cta-btn fade-up delay-2">Start a Project <span>→</span></a>
 </section>
 
 <footer>
@@ -287,13 +204,12 @@
     <li><a href="#">Instagram</a></li><li><a href="#">Behance</a></li>
     <li><a href="#">LinkedIn</a></li><li><a href="#">Dribbble</a></li>
   </ul>
-  <div class="footer-copy">© 2026 ClassicGraphics™.<br>All rights reserved.</div>
+  <div class="footer-copy">© 2026 ChoiJM™.<br>All rights reserved.</div>
 </footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-storage.js";
+import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAF4mQWQ8Ic9exTEjUe6Mqh_h8asOVXouU",
@@ -307,7 +223,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 /* ===================================================
    DATA — Firebase Firestore
@@ -325,47 +240,21 @@ async function fetchProjectsFromDB() {
     querySnapshot.forEach((doc) => {
       projects.push({ dbId: doc.id, ...doc.data() });
     });
-    // 정렬: 생성 시간 역순 (가장 최근 등록이 맨 앞) 또는 원하는 기준
     projects.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-    localProjects = projects;
+    localProjects = projects.map(p => {
+      const rawImages = Array.isArray(p.images) ? p.images : [p.img1, p.img2].filter(Boolean);
+      const img = rawImages.slice().filter(Boolean);
+      const thumb = p.thumb || '';
+      if (!img.length && thumb) img.push(thumb);
+      if (thumb && img[0] !== thumb) img.unshift(thumb);
+      return { ...p, images: img, thumb: img[0] || thumb || '' };
+    });
     return projects;
   } catch (e) {
     console.error("Error fetching projects: ", e);
     return [];
   }
 }
-
-async function saveProjectToDB(data) {
-  try {
-    if (data.dbId) {
-      // Update
-      const docRef = doc(db, "projects", data.dbId);
-      const { dbId, ...updateData } = data;
-      await updateDoc(docRef, updateData);
-    } else {
-      // Add
-      data.createdAt = Date.now();
-      await addDoc(collection(db, "projects"), data);
-    }
-    await fetchProjectsFromDB(); // 갱신 후 리스트 다시 불러오기
-  } catch (e) {
-    console.error("Error saving project: ", e);
-    alert('저장 중 오류가 발생했습니다. 콘솔을 확인해주세요.');
-    throw e;
-  }
-}
-
-async function deleteProjectFromDB(dbId) {
-  try {
-    await deleteDoc(doc(db, "projects", dbId));
-    await fetchProjectsFromDB();
-  } catch (e) {
-    console.error("Error deleting project: ", e);
-    alert('삭제 중 오류가 발생했습니다.');
-  }
-}
-
-function genId() { return 'p' + Date.now(); }
 /* ===================================================
    SCROLL FX
 =================================================== */
@@ -483,7 +372,8 @@ function openPopup(p) {
 
   const imgBox = document.getElementById('pmImages');
   imgBox.innerHTML = '';
-  [p.img1, p.img2].forEach(src => {
+  const images = Array.isArray(p.images) ? p.images : [p.img1, p.img2].filter(Boolean);
+  images.forEach(src => {
     if (src) {
       const d = document.createElement('div');
       d.className = 'popup-image';
@@ -572,7 +462,10 @@ document.getElementById('pwOverlay').querySelector('.pw-keypad').addEventListene
 
   if (pwInput.length === 4) {
     if (pwInput === ADMIN_PW) {
-      setTimeout(() => { closePwModal(); openAdmin(); }, 200);
+      setTimeout(() => {
+        sessionStorage.setItem('admin_ok', '1');
+        window.location.href = 'admin.html';
+      }, 150);
     } else {
       document.getElementById('pwError').textContent = '❌ Wrong PIN';
       setTimeout(() => {
@@ -586,237 +479,53 @@ document.getElementById('pwOverlay').querySelector('.pw-keypad').addEventListene
 
 document.getElementById('pwCancel').addEventListener('click', closePwModal);
 
-/* ===================================================
-   ADMIN
-=================================================== */
-function openAdmin() {
-  document.getElementById('adminOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  renderAdminList();
-  switchTab('projects');
-}
-function closeAdmin() {
-  document.getElementById('adminOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-  renderProjects(); // reflect any changes on the main site
-}
-
-document.getElementById('adminExit').addEventListener('click', closeAdmin);
-
-document.querySelectorAll('.admin-nav-item').forEach(item => {
-  item.addEventListener('click', e => {
-    e.preventDefault();
-    switchTab(item.dataset.tab);
-  });
-});
-
-function switchTab(tab) {
-  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-}
-
-document.getElementById('goAddBtn').addEventListener('click', () => {
-  resetForm();
-  document.getElementById('formTitle').textContent = 'Add New Project';
-  document.getElementById('formSub').textContent = '새 프로젝트 정보를 입력하세요.';
-  switchTab('add');
-});
-
-async function renderAdminList() {
-  const projects = await getProjects();
-  const list = document.getElementById('adminProjectList');
-  list.innerHTML = '';
-
-  if (!projects.length) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📂</div><p>No projects. Click "Add Project" to start.</p></div>`;
-    return;
-  }
-
-  const BG = ['#1a2d1a','#1a1a2d','#2d1a0a','#0a1a2d','#1a0d1a','#0a2d1a'];
-  projects.forEach(p => {
-    const row = document.createElement('div');
-    row.className = 'project-row';
-    const ci = parseInt(p.color) % 6;
-    const thumbStyle = p.thumb
-      ? `background-image:url('${p.thumb}');background-size:cover;background-position:center;`
-      : `background:${BG[ci]};`;
-    row.innerHTML = `
-      <div class="project-row-thumb" style="${thumbStyle}">${!p.thumb ? 'no img' : ''}</div>
-      <div class="project-row-info">
-        <div class="project-row-name">${p.name}</div>
-        <div class="project-row-tag">${p.tag}${p.year ? ' · ' + p.year : ''}${p.size === 'large' ? ' · LARGE' : ''}</div>
-      </div>
-      <div class="project-row-actions">
-        <button class="btn-edit" data-id="${p.dbId}">Edit</button>
-        <button class="btn-delete" data-id="${p.dbId}">Delete</button>
-      </div>
-    `;
-    list.appendChild(row);
-  });
-
-  list.querySelectorAll('.btn-edit').forEach(b => b.addEventListener('click', () => editProject(b.dataset.id)));
-  list.querySelectorAll('.btn-delete').forEach(b => b.addEventListener('click', () => deleteProject(b.dataset.id)));
-}
-
-async function deleteProject(dbId) {
-  if (!confirm('이 프로젝트를 삭제하시겠습니까?')) return;
-  await deleteProjectFromDB(dbId);
-  await renderAdminList();
-  showToast('프로젝트가 삭제되었습니다');
-}
-
-async function editProject(dbId) {
-  const projects = await getProjects();
-  const p = projects.find(x => x.dbId === dbId);
-  if (!p) return;
-  document.getElementById('editId').value   = p.dbId;
-  document.getElementById('fName').value    = p.name;
-  document.getElementById('fTag').value     = p.tag;
-  document.getElementById('fYear').value    = p.year || '';
-  document.getElementById('fClient').value  = p.client || '';
-  document.getElementById('fSize').value    = p.size || 'normal';
-  document.getElementById('fColor').value   = p.color || '0';
-  document.getElementById('fShortDesc').value = p.shortDesc || '';
-  document.getElementById('fDesc').value    = p.desc || '';
-  document.getElementById('fThumb').value   = p.thumb || '';
-  document.getElementById('fImg1').value    = p.img1 || '';
-  document.getElementById('fImg2').value    = p.img2 || '';
-  document.getElementById('fUrl').value     = p.url || '';
-  updateThumbPreview();
-  document.getElementById('formTitle').textContent = 'Edit Project';
-  document.getElementById('formSub').textContent = `수정 중: ${p.name}`;
-  switchTab('add');
-}
-
-function resetForm() {
-  document.getElementById('editId').value = '';
-  ['fName','fTag','fYear','fClient','fShortDesc','fDesc','fThumb','fImg1','fImg2','fUrl'].forEach(id => document.getElementById(id).value = '');
-  ['fThumbFile','fImg1File','fImg2File'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('fSize').value = 'normal';
-  document.getElementById('fColor').value = '0';
-  updateThumbPreview();
-}
-
-function updateThumbPreview() {
-  const url = document.getElementById('fThumb').value.trim();
-  const prev = document.getElementById('thumbPreview');
-  if (url) { prev.style.backgroundImage = `url('${url}')`; prev.innerHTML = ''; }
-  else { prev.style.backgroundImage = ''; prev.innerHTML = '<span>No Image — Preview Here</span>'; }
-}
-document.getElementById('fThumb').addEventListener('input', updateThumbPreview);
-
-// Image File Upload Handlers (Cloudinary)
-const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/ddhkzppo2/image/upload";
-const CLOUDINARY_UPLOAD_PRESET = "jimportfolio"; // 사용자 지정 unsigned 프리셋 이름
-
-async function uploadToCloudinary(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-
-  try {
-    const response = await fetch(CLOUDINARY_URL, {
-      method: "POST",
-      body: formData
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Cloudinary error details:", errorData);
-      throw new Error(errorData.error?.message || "Upload failed");
-    }
-    
-    const data = await response.json();
-    return data.secure_url;
-  } catch (error) {
-    console.error("Error uploading to Cloudinary:", error);
-    throw error;
-  }
-}
-
-function handleImageUpload(fileInputId, urlInputId) {
-  const fileInput = document.getElementById(fileInputId);
-  const urlInput = document.getElementById(urlInputId);
-  
-  fileInput.addEventListener('change', async function() {
-    const file = this.files[0];
-    if (file) {
-      try {
-        urlInput.value = '업로드 중... (Cloudinary)';
-        
-        const downloadURL = await uploadToCloudinary(file);
-        
-        urlInput.value = downloadURL;
-        if (fileInputId === 'fThumbFile') {
-          updateThumbPreview();
-        }
-      } catch (error) {
-        alert("이미지 업로드에 실패했습니다. Upload Preset 설정을 확인해주세요.");
-        urlInput.value = '';
-      }
-    }
-  });
-}
-
-handleImageUpload('fThumbFile', 'fThumb');
-handleImageUpload('fImg1File', 'fImg1');
-handleImageUpload('fImg2File', 'fImg2');
-
-document.getElementById('saveBtn').addEventListener('click', async () => {
-  const name = document.getElementById('fName').value.trim();
-  const tag  = document.getElementById('fTag').value.trim();
-  if (!name || !tag) { alert('프로젝트 이름과 카테고리는 필수입니다.'); return; }
-
-  const editId = document.getElementById('editId').value;
-  const data = {
-    name, tag,
-    year:      document.getElementById('fYear').value.trim(),
-    client:    document.getElementById('fClient').value.trim(),
-    size:      document.getElementById('fSize').value,
-    color:     document.getElementById('fColor').value,
-    shortDesc: document.getElementById('fShortDesc').value.trim(),
-    desc:      document.getElementById('fDesc').value.trim(),
-    thumb:     document.getElementById('fThumb').value.trim(),
-    img1:      document.getElementById('fImg1').value.trim(),
-    img2:      document.getElementById('fImg2').value.trim(),
-    url:       document.getElementById('fUrl').value.trim(),
-  };
-
-  if (editId) {
-    data.dbId = editId;
-  }
-
-  // 저장 버튼 비활성화 (중복 클릭 방지)
-  const saveBtn = document.getElementById('saveBtn');
-  const originalText = saveBtn.textContent;
-  saveBtn.disabled = true;
-  saveBtn.textContent = '저장 중...';
-
-  try {
-    await saveProjectToDB(data);
-    await renderAdminList();
-    resetForm();
-    showToast(editId ? '✓ 프로젝트가 수정되었습니다' : '✓ 프로젝트가 추가되었습니다');
-    switchTab('projects');
-  } catch (e) {
-    // 에러 처리는 saveProjectToDB 내부에서 함
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = originalText;
-  }
-});
-
-document.getElementById('cancelEditBtn').addEventListener('click', () => {
-  resetForm();
-  switchTab('projects');
-});
-
 /* ESC */
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closePopup(); closePwModal(); }
 });
+
+/* ===================================================
+   ABOUT POPUP
+=================================================== */
+const aboutOverlay = document.getElementById('aboutOverlay');
+const navAbout = document.getElementById('navAbout');
+const aboutClose = document.getElementById('aboutClose');
+const aboutContentDisplay = document.getElementById('aboutContentDisplay');
+
+if (navAbout) {
+  navAbout.addEventListener('click', (e) => {
+    e.preventDefault();
+    aboutOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+}
+
+if (aboutClose) {
+  aboutClose.addEventListener('click', () => {
+    aboutOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+}
+
+if (aboutOverlay) {
+  aboutOverlay.addEventListener('click', (e) => {
+    if (e.target === aboutOverlay) {
+      aboutOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+}
+
+async function fetchAboutFromDB() {
+  try {
+    const aboutRef = doc(db, 'site', 'about');
+    const snap = await getDoc(aboutRef);
+    const html = snap.exists() ? (snap.data()?.html || '') : '';
+    if (html) aboutContentDisplay.innerHTML = html;
+  } catch (e) {
+    console.error('Error fetching about: ', e);
+  }
+}
 
 /* ===================================================
    MOBILE MENU TOGGLE
@@ -846,6 +555,7 @@ if (menuToggle && navLinks) {
 =================================================== */
 fetchProjectsFromDB().then(() => {
   renderProjects();
+  fetchAboutFromDB();
 });
 </script>
 </body>

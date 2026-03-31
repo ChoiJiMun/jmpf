@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChoiJM™ — Admin</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="toast" id="toast"></div>
+
+  <div class="pw-overlay" id="pwOverlay">
+    <div class="pw-box">
+      <div class="pw-title">Admin Access — Enter PIN</div>
+      <div class="pw-dots" id="pwDots">
+        <div class="pw-dot" id="d0"></div>
+        <div class="pw-dot" id="d1"></div>
+        <div class="pw-dot" id="d2"></div>
+        <div class="pw-dot" id="d3"></div>
+      </div>
+      <div class="pw-keypad">
+        <button class="pw-key" data-k="1">1</button>
+        <button class="pw-key" data-k="2">2</button>
+        <button class="pw-key" data-k="3">3</button>
+        <button class="pw-key" data-k="4">4</button>
+        <button class="pw-key" data-k="5">5</button>
+        <button class="pw-key" data-k="6">6</button>
+        <button class="pw-key" data-k="7">7</button>
+        <button class="pw-key" data-k="8">8</button>
+        <button class="pw-key" data-k="9">9</button>
+        <button class="pw-key wide" data-k="del">⌫  Del</button>
+        <button class="pw-key" data-k="0">0</button>
+      </div>
+      <div class="pw-error" id="pwError"></div>
+      <button class="pw-cancel" id="pwCancel">Back to Site</button>
+    </div>
+  </div>
+
+  <div class="admin-overlay open" id="adminOverlay">
+    <div class="admin-header">
+      <div class="admin-logo">ChoiJM™ <span>/ Admin Dashboard</span></div>
+      <a class="admin-exit" id="adminExit" href="./">← Exit to Site</a>
+    </div>
+    <div class="admin-body">
+      <div class="admin-sidebar">
+        <div class="admin-sidebar-title">Menu</div>
+        <a class="admin-nav-item active" data-tab="projects" href="#">📁  Projects</a>
+        <a class="admin-nav-item" data-tab="add" href="#">＋  Add Project</a>
+        <a class="admin-nav-item" data-tab="about" href="#">👤  About Me</a>
+      </div>
+      <div class="admin-main">
+        <div class="admin-tab active" id="tab-projects">
+          <div class="admin-section-title">All Projects</div>
+          <div class="admin-section-sub">프로젝트를 편집하거나 삭제하세요. 순서는 등록 순서대로 표시됩니다.</div>
+          <div class="project-list" id="adminProjectList"></div>
+          <button class="btn-primary" id="goAddBtn">+ Add New Project</button>
+        </div>
+
+        <div class="admin-tab" id="tab-add">
+          <div class="admin-section-title" id="formTitle">Add Project</div>
+          <div class="admin-section-sub" id="formSub">프로젝트 정보를 입력하세요.</div>
+          <div class="admin-form">
+            <input type="hidden" id="editId">
+
+            <div class="form-grid">
+              <div class="form-row">
+                <label class="form-label">Project Name *</label>
+                <input class="form-input" id="fName" placeholder="e.g. Lumière Finance">
+              </div>
+              <div class="form-row">
+                <label class="form-label">Category / Tag *</label>
+                <input class="form-input" id="fTag" placeholder="e.g. Brand Identity">
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-row">
+                <label class="form-label">Year</label>
+                <input class="form-input" id="fYear" placeholder="2024">
+              </div>
+              <div class="form-row">
+                <label class="form-label">Client / Company</label>
+                <input class="form-input" id="fClient" placeholder="e.g. Acme Corp">
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-row">
+                <label class="form-label">Grid Size</label>
+                <select class="form-select" id="fSize">
+                  <option value="normal">Normal — Half Width</option>
+                  <option value="large">Large — Full Width</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label class="form-label">Card Color Theme</label>
+                <select class="form-select" id="fColor">
+                  <option value="0">🌿 Forest Green</option>
+                  <option value="1">🌌 Deep Violet</option>
+                  <option value="2">🍂 Amber Dark</option>
+                  <option value="3">🌊 Ocean Blue</option>
+                  <option value="4">🌹 Crimson</option>
+                  <option value="5">💚 Emerald</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label class="form-label">Short Description (card hover text)</label>
+              <input class="form-input" id="fShortDesc" placeholder="카드 호버 시 보여지는 한 줄 설명...">
+            </div>
+
+            <div class="form-row">
+              <label class="form-label">Full Description (popup body)</label>
+              <textarea class="form-textarea" id="fDesc" placeholder="팝업에서 보여지는 상세 설명입니다. 줄바꿈을 사용하면 그대로 표시됩니다."></textarea>
+            </div>
+
+            <div class="form-row">
+              <label class="form-label">Images (drag & drop, unlimited)</label>
+              <div class="image-dropzone" id="imageDropzone" tabindex="0">
+                <div class="image-dropzone-title">Drop images here, or click to upload</div>
+                <div class="image-dropzone-sub">첫 번째 이미지가 대표 이미지(썸네일)로 사용됩니다. 드래그로 순서를 바꾸세요.</div>
+              </div>
+              <input type="file" id="imageFileInput" accept="image/*" multiple hidden>
+              <div class="image-list" id="imageList"></div>
+            </div>
+
+            <div class="form-row">
+              <label class="form-label">Project URL (optional)</label>
+              <input class="form-input" id="fUrl" placeholder="https://...">
+            </div>
+
+            <div class="form-actions">
+              <button class="btn-primary" id="saveBtn">💾  Save Project</button>
+              <button class="btn-secondary" id="cancelEditBtn">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-tab" id="tab-about">
+          <div class="admin-section-title">Manage About</div>
+          <div class="admin-section-sub">이력/소개 HTML을 입력하면 About 팝업에 그대로 표시됩니다.</div>
+          <div class="admin-form">
+            <div class="form-row">
+              <textarea class="form-textarea" id="adminAboutText" style="min-height:320px;"></textarea>
+            </div>
+            <div class="form-actions">
+              <button class="btn-primary" id="saveAboutBtn">💾 Save About</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
