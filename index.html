@@ -140,7 +140,12 @@
       <div class="section-label fade-up">Selected Work</div>
       <h2 class="section-title fade-up delay-1">Projects that<br>define <em>eras</em></h2>
     </div>
-    <a href="#" class="section-link fade-up delay-2">View all work</a>
+    <div class="work-actions fade-up delay-2">
+      <div class="work-layout-toggle" id="workLayoutToggle">
+        <button class="work-layout-btn" type="button" data-cols="2" aria-pressed="false">2</button>
+        <button class="work-layout-btn" type="button" data-cols="3" aria-pressed="true">3</button>
+      </div>
+    </div>
   </div>
   <div class="projects-grid" id="projectsGrid"></div>
 </section>
@@ -532,6 +537,29 @@ if (menuToggle && navLinks) {
         menuToggle.textContent = '☰';
       }
     });
+  });
+}
+
+const workLayoutToggle = document.getElementById('workLayoutToggle');
+function setWorkCols(cols) {
+  if (cols === 3) document.body.classList.add('work-cols-3');
+  else document.body.classList.remove('work-cols-3');
+  if (!workLayoutToggle) return;
+  workLayoutToggle.querySelectorAll('.work-layout-btn').forEach(btn => {
+    const isActive = parseInt(btn.dataset.cols, 10) === cols;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+}
+
+if (workLayoutToggle) {
+  if (window.innerWidth > 1024) setWorkCols(3);
+  else setWorkCols(2);
+  workLayoutToggle.addEventListener('click', e => {
+    const btn = e.target.closest('.work-layout-btn');
+    if (!btn) return;
+    const cols = parseInt(btn.dataset.cols, 10);
+    setWorkCols(cols);
   });
 }
 

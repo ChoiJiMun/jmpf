@@ -56,6 +56,7 @@ section{padding:120px 48px;}
 
 /* PROJECT GRID */
 .projects-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;}
+body.work-cols-3 .projects-grid{grid-template-columns:repeat(3,1fr);}
 .project-card{position:relative;overflow:hidden;aspect-ratio:1024/800;background:var(--mid);}
 .project-card.large{grid-column:span 2;aspect-ratio:1024/800;}
 .project-card:hover .project-bg{transform:scale(1.05);}
@@ -77,6 +78,12 @@ section{padding:120px 48px;}
 .project-card:hover .project-hover-info{transform:translateY(0);opacity:1;}
 .project-hover-info p{font-size:13px;color:rgba(240,237,230,.65);line-height:1.6;margin-top:10px;}
 .view-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;}
+
+.work-actions{display:flex;align-items:center;gap:12px;}
+.work-layout-toggle{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(240,237,230,.2);border-radius:999px;padding:6px;background:rgba(10,10,8,.35);}
+.work-layout-btn{border:none;background:transparent;color:rgba(240,237,230,.65);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;padding:6px 10px;border-radius:999px;cursor:pointer;transition:background .15s,color .15s;}
+.work-layout-btn.active{background:rgba(200,242,77,.12);color:var(--accent);}
+.work-layout-btn:hover{color:var(--fg);}
 
 /* SERVICES */
 .services-section{background:var(--mid);}
@@ -289,6 +296,7 @@ option{background:var(--bg);}
   
   /* Projects Grid */
   .projects-grid { grid-template-columns: 1fr; }
+  body.work-cols-3 .projects-grid { grid-template-columns: 1fr; }
   .project-card.large { grid-column: span 1; aspect-ratio: 1024/800; }
   .project-name { font-size: 20px; }
   
