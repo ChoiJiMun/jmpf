@@ -256,6 +256,36 @@ option{background:var(--bg);}
 .about-content li{margin-bottom:8px;padding-left:16px;position:relative;color:rgba(240,237,230,.8);}
 .about-content li::before{content:'•';position:absolute;left:0;color:var(--accent);}
 
+/* ABOUT LANG TOGGLE */
+.about-lang-toggle {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.lang-btn {
+  background: transparent;
+  border: 1px solid var(--muted);
+  color: var(--fg);
+  padding: 6px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  opacity: 0.5;
+}
+.lang-btn.active {
+  opacity: 1;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.lang-content-section {
+  display: none;
+}
+.lang-content-section.active {
+  display: block;
+}
+
 /* LOGO HINT */
 .logo-hint{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);z-index:5000;opacity:0;transition:opacity .3s;pointer-events:none;}
 .logo-hint.show{opacity:1;}

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChoiJM™ — Digital Design Agency</title>
+<title>ChoiJM™ — Digital Design Agency.</title>
 <link rel="stylesheet" href="style.css?v=20260331b">
 </head>
 <body>
@@ -69,25 +69,69 @@
   <div class="about-panel" id="aboutPanel">
     <button class="about-close" id="aboutClose">×</button>
     <div class="about-content" id="aboutContentDisplay">
-      <h2>About Me</h2>
-      <p>Hello! I'm a passionate Digital Designer & Publisher based in Seoul. I specialize in creating visually stunning and highly functional digital experiences.</p>
-      
-      <h3>Experience</h3>
-      <ul>
-        <li><strong>Senior Designer</strong> at ChoiJM Studio (2021 - Present)</li>
-        <li><strong>UI/UX Designer</strong> at Creative Agency (2018 - 2021)</li>
-      </ul>
-      
-      <h3>Skills</h3>
-      <ul>
-        <li>UI/UX Design, Web Publishing, Branding, Motion Graphics</li>
-        <li>Figma, Adobe Creative Suite, HTML/CSS, JavaScript</li>
-      </ul>
-      
-      <h3>Education</h3>
-      <ul>
-        <li>BA in Visual Communication Design (2018)</li>
-      </ul>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="margin:0;">About Me</h2>
+        <div class="about-lang-toggle">
+          <button class="lang-btn active" data-lang="ko">KOR</button>
+          <button class="lang-btn" data-lang="en">ENG</button>
+        </div>
+      </div>
+
+      <!-- Korean Version -->
+      <div class="lang-content-section active" id="about-ko">
+        <p><strong>UI/UX 디자인 경력 13년 이상</strong>, 누적 다운로드 1,100만의 대형 서비스부터 스타트업까지 다양한 규모의 서비스를 설계하고 개선해 온 시니어 프로덕트 디자이너입니다. 2D/3D, React, AI 툴까지 직접 다루며 실행력 중심으로 일해 왔습니다.</p>
+        
+        <h3>Core Capabilities</h3>
+        <ul>
+          <li><strong>조직 리드 및 기획:</strong> 스타트업 Product Designer 겸 팀장 역임 (Tips 프로그램 선정), 배달통 4인 디자인팀 구성 및 총괄</li>
+          <li><strong>프로덕트 사이클 완수:</strong> MacOS 전용 앱 'PaceBuddy' 기획·개발(AI 코딩)·출시 및 인앱 결제 구현</li>
+          <li><strong>AI & 신기술 적용:</strong> RAG 기반 AI 서비스(COSMAX INSIGHT) UX/UI 설계, Framer 활용 웹사이트 제작 및 운영</li>
+          <li><strong>커뮤니케이션 & 관리:</strong> COSMAX, LG U+, BNK금융, KT 등 대기업 및 스타트업 실무자 직접 소통 및 다중 프로젝트 핸들링</li>
+          <li><strong>프로모션 & 모션:</strong> 브랜드 프로모션 기획/제작, 일러스트/모션 그래픽 작업, 마케팅 디자인 지원</li>
+        </ul>
+        
+        <h3>Tools & Skills</h3>
+        <ul>
+          <li>Figma, Framer, After Effects, Midjourney, Adobe AI Tools</li>
+          <li>React, HTML/CSS, JS (퍼블리싱 수준)</li>
+          <li>2D & 3D 기반 협업 및 디자인 시스템 구축</li>
+        </ul>
+        
+        <h3>Selected Projects</h3>
+        <ul>
+          <li><strong>AI & 플랫폼:</strong> COSMAX Insight 웹사이트, LG U+ PSS/TAS 디자인 시스템, SQNT CMS 및 웹사이트</li>
+          <li><strong>금융 & 서비스:</strong> BNK경남은행 전자증명서/수취시스템, SK Ttogether withU, 배달통, 멕시카나 앱, 서울애배달</li>
+          <li><strong>프로모션 & 기타:</strong> Kolmar 프로모션 웹/모션, 이건창호 공식웹사이트 제안, 재돈 성형외과/치과 UI/UX 등 다수</li>
+        </ul>
+      </div>
+
+      <!-- English Version -->
+      <div class="lang-content-section" id="about-en">
+        <p><strong>Over 13 years of UI/UX design experience.</strong> A Senior Product Designer who has designed and improved services ranging from large-scale apps with 11M+ downloads to agile startups. I operate with a strong focus on execution, directly utilizing 2D/3D, React, and AI tools.</p>
+        
+        <h3>Core Capabilities</h3>
+        <ul>
+          <li><strong>Leadership & Strategy:</strong> Served as Product Designer & Team Lead at a Tips-selected startup; built and managed a 4-person design team at Baedaltong.</li>
+          <li><strong>Full Product Cycle:</strong> Planned, developed (via AI coding), and launched 'PaceBuddy', a MacOS-exclusive app complete with in-app purchases.</li>
+          <li><strong>AI & Emerging Tech:</strong> Led UX/UI design for RAG-based AI service (COSMAX INSIGHT); developed and managed websites using Framer.</li>
+          <li><strong>Communication & Management:</strong> Directly communicated with stakeholders from major corporations (COSMAX, LG U+, BNK, KT) and startups, handling multiple complex projects simultaneously.</li>
+          <li><strong>Promotion & Motion:</strong> Planned and produced brand promotion pages, illustrations, motion graphics, and supported marketing design initiatives.</li>
+        </ul>
+        
+        <h3>Tools & Skills</h3>
+        <ul>
+          <li>Figma, Framer, After Effects, Midjourney, Adobe AI Tools</li>
+          <li>React, HTML/CSS, JS (Publisher Level)</li>
+          <li>2D & 3D collaboration and Design System architecture</li>
+        </ul>
+        
+        <h3>Selected Projects</h3>
+        <ul>
+          <li><strong>AI & Platforms:</strong> COSMAX Insight Website, LG U+ PSS/TAS Design System, SQNT CMS & Website</li>
+          <li><strong>Finance & Services:</strong> BNK Electronic Certificate/Receipt System, SK Ttogether withU, Baedaltong, Mexicana App, Seoul Delivery</li>
+          <li><strong>Promotions & Others:</strong> Kolmar Promotion Web/Motion, Eagon Window Official Web Proposal, Jaedon Plastic Surgery UI/UX, and more.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
@@ -502,6 +546,25 @@ if (aboutOverlay) {
     if (e.target === aboutOverlay) {
       aboutOverlay.classList.remove('open');
       document.body.style.overflow = '';
+    }
+  });
+}
+
+// About Language Toggle Logic
+if (aboutContentDisplay) {
+  aboutContentDisplay.addEventListener('click', (e) => {
+    if (e.target.classList.contains('lang-btn')) {
+      const lang = e.target.getAttribute('data-lang');
+      
+      // Update buttons
+      aboutContentDisplay.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+      });
+      
+      // Update content sections
+      aboutContentDisplay.querySelectorAll('.lang-content-section').forEach(section => {
+        section.classList.toggle('active', section.id === `about-${lang}`);
+      });
     }
   });
 }
