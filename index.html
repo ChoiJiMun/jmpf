@@ -316,10 +316,10 @@ async function renderProjects() {
 
     const ci = parseInt(p.color) % 6;
     const bgClass = `g${ci}`;
-    const bgImg = p.thumb ? `style="background-image:url('${p.thumb}')"` : '';
+    const bgImg = p.thumb ? `<img class="project-img" src="${p.thumb}" alt="" loading="lazy" decoding="async">` : '';
 
     card.innerHTML = `
-      <div class="project-bg ${bgClass}" ${bgImg}></div>
+      <div class="project-bg ${bgClass}">${bgImg}</div>
       <div class="proj-deco">${DECOS[ci]}</div>
       <span class="project-year">${p.year || ''}</span>
       <div class="project-always">
