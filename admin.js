@@ -63,7 +63,13 @@ async function fetchProjectsFromDB() {
   const querySnapshot = await getDocs(collection(db, "projects"));
   const list = [];
   querySnapshot.forEach((d) => list.push({ dbId: d.id, ...d.data() }));
-  list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  // 'order' 필드가 있으면 그것으로 정렬, 없으면 createdAt으로 정렬
+  list.sort((a, b) => {
+    if (a.order !== undefined && b.order !== undefined) {
+      return a.order - b.order;
+    }
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
   projectsCache = list.map(normalizeProject);
   return projectsCache;
 }
@@ -75,7 +81,19 @@ async function saveProjectToDB(data) {
     await updateDoc(docRef, updateData);
   } else {
     data.createdAt = Date.now();
+    // 새 프로젝트는 가장 마지막 순서로 (현재 프로젝트 개수만큼의 order 부여)
+    data.order = projectsCache.length;
     await addDoc(collection(db, "projects"), data);
+  }
+  await fetchProjectsFromDB();
+}
+
+async function saveProjectsOrder(newOrderIds) {
+  const batch = []; // Firebase 9에서는 별도의 batch API가 있지만 간단하게 루프로 처리
+  for (let i = 0; i < newOrderIds.length; i++) {
+    const id = newOrderIds[i];
+    const docRef = doc(db, "projects", id);
+    await updateDoc(docRef, { order: i });
   }
   await fetchProjectsFromDB();
 }
@@ -223,12 +241,14 @@ function renderAdminList() {
   projectsCache.forEach((p) => {
     const row = document.createElement("div");
     row.className = "project-row";
+    row.dataset.id = p.dbId; // 드래그 앤 드롭을 위한 id
     const ci = parseInt(p.color || "0", 10) % 6;
     const thumb = p.thumb || (p.images?.[0] || "");
     const thumbStyle = thumb
       ? `background-image:url('${thumb}');background-size:cover;background-position:center;`
       : `background:${BG[ci]};`;
     row.innerHTML = `
+      <div class="project-drag-handle">⋮⋮</div>
       <div class="project-row-thumb" style="${thumbStyle}">${!thumb ? "no img" : ""}</div>
       <div class="project-row-info">
         <div class="project-row-name">${p.name || ""}</div>
@@ -241,6 +261,25 @@ function renderAdminList() {
     `;
     list.appendChild(row);
   });
+
+  // SortableJS 초기화
+  if (projectsCache.length > 1) {
+    Sortable.create(list, {
+      handle: ".project-drag-handle",
+      animation: 150,
+      onEnd: async () => {
+        const rows = list.querySelectorAll(".project-row");
+        const newOrderIds = Array.from(rows).map((row) => row.dataset.id);
+        try {
+          await saveProjectsOrder(newOrderIds);
+          showToast("✓ 순서가 저장되었습니다");
+        } catch (e) {
+          console.error("Order save failed", e);
+          alert("순서 저장에 실패했습니다.");
+        }
+      },
+    });
+  }
 
   list.querySelectorAll(".btn-edit").forEach((b) => b.addEventListener("click", () => editProject(b.dataset.id)));
   list.querySelectorAll(".btn-delete").forEach((b) => b.addEventListener("click", () => deleteProject(b.dataset.id)));

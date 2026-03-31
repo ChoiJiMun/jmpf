@@ -303,7 +303,13 @@ async function fetchProjectsFromDB() {
     querySnapshot.forEach((doc) => {
       projects.push({ dbId: doc.id, ...doc.data() });
     });
-    projects.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    // 'order' 필드가 있으면 그것으로 정렬, 없으면 createdAt으로 정렬
+    projects.sort((a, b) => {
+      if (a.order !== undefined && b.order !== undefined) {
+        return a.order - b.order;
+      }
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    });
     localProjects = projects.map(p => {
       const rawImages = Array.isArray(p.images) ? p.images : [p.img1, p.img2].filter(Boolean);
       const img = rawImages.slice().filter(Boolean);
