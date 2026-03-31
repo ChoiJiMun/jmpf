@@ -100,7 +100,7 @@ body.work-cols-3 .projects-grid{grid-template-columns:repeat(3,1fr);}
 
 /* ABOUT */
 .about-strip{display:grid;grid-template-columns:1fr 1fr;gap:120px;align-items:center;padding:120px 48px;}
-.big-num{font-family:'Playfair Display',serif;font-size:clamp(80px,14vw,180px);font-weight:400;color:transparent;-webkit-text-stroke:1px rgba(240,237,230,.15);line-height:1;margin-bottom:-20px;}
+.big-num{font-family:'Playfair Display',serif;font-size:clamp(80px,14vw,180px);font-weight:400;color:transparent;-webkit-text-stroke:1px rgba(240, 237, 230, 0.481);line-height:1;margin-bottom:-20px;}
 .about-sub{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);}
 .about-right p{font-size:18px;line-height:1.7;color:rgba(240,237,230,.7);margin-bottom:24px;font-weight:200;}
 .about-right p strong{color:var(--fg);font-weight:400;}
