@@ -1413,6 +1413,14 @@
 </div>
 
 <script>
+(function(){
+  const KEY = 'sudden_gate_ok';
+  const PIN = '9764';
+  if (sessionStorage.getItem(KEY) === '1') return;
+  const r = prompt('Sudden PIN');
+  if (r === PIN) { sessionStorage.setItem(KEY, '1'); return; }
+  window.location.href = '../list/';
+})();
 function showPage(name, tabEl) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));

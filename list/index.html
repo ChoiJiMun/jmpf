@@ -139,6 +139,21 @@
     .back-link:hover {
       color: var(--fg);
     }
+
+    .pin-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(10,10,8,.92);backdrop-filter:blur(10px);padding:24px;z-index:9999;}
+    .pin-overlay.open{display:flex;}
+    .pin-panel{width:100%;max-width:420px;border:1px solid var(--muted);border-radius:10px;padding:28px 24px;background:rgba(10,10,8,.92);}
+    .pin-title{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,237,230,.55);margin-bottom:14px;}
+    .pin-dots{display:flex;gap:10px;justify-content:center;margin:18px 0 10px;}
+    .pin-dot{width:12px;height:12px;border-radius:999px;border:1px solid rgba(240,237,230,.25);background:transparent;}
+    .pin-dot.filled{background:var(--accent);border-color:var(--accent);}
+    .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;}
+    .pin-key{border:1px solid rgba(240,237,230,.18);background:transparent;color:var(--fg);padding:14px 0;border-radius:10px;font-size:14px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;}
+    .pin-key:hover{background:rgba(240,237,230,.06);border-color:rgba(240,237,230,.35);}
+    .pin-key.wide{grid-column:span 2;}
+    .pin-actions{display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+    .pin-error{font-size:12px;color:rgba(255,107,107,.9);min-height:16px;}
+    .pin-cancel{background:none;border:none;color:rgba(240,237,230,.45);font-size:12px;cursor:pointer;text-decoration:underline;text-underline-offset:4px;}
   </style>
 
   <link rel="icon" href="/jmpf/favicon.ico" sizes="any">
@@ -161,7 +176,7 @@
         <div class="item-arrow">↗</div>
       </a>
 
-      <a href="../sudden/" class="list-item">
+      <a href="../sudden/" class="list-item" id="suddenLink">
         <div class="item-content">
           <div class="item-name">Sudden Project</div>
           <div class="item-desc">View the sudden match admin dashboard</div>
@@ -172,5 +187,148 @@
 
     <a href="../" class="back-link">← Return to Main Site</a>
   </div>
+
+  <div class="pin-overlay" id="pinOverlay" aria-hidden="true">
+    <div class="pin-panel" role="dialog" aria-modal="true" aria-label="Enter PIN">
+      <div class="pin-title">Sudden Access</div>
+      <div class="pin-dots" id="pinDots">
+        <div class="pin-dot" id="pd0"></div>
+        <div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div>
+        <div class="pin-dot" id="pd3"></div>
+      </div>
+      <div class="pin-error" id="pinError"></div>
+      <div class="pin-pad" id="pinPad">
+        <button class="pin-key" type="button" data-k="1">1</button>
+        <button class="pin-key" type="button" data-k="2">2</button>
+        <button class="pin-key" type="button" data-k="3">3</button>
+        <button class="pin-key" type="button" data-k="4">4</button>
+        <button class="pin-key" type="button" data-k="5">5</button>
+        <button class="pin-key" type="button" data-k="6">6</button>
+        <button class="pin-key" type="button" data-k="7">7</button>
+        <button class="pin-key" type="button" data-k="8">8</button>
+        <button class="pin-key" type="button" data-k="9">9</button>
+        <button class="pin-key wide" type="button" data-k="del">⌫ Del</button>
+        <button class="pin-key" type="button" data-k="0">0</button>
+      </div>
+      <div class="pin-actions">
+        <div></div>
+        <button class="pin-cancel" type="button" id="pinCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUDDEN_PIN = '9764';
+    const SUDDEN_KEY = 'sudden_gate_ok';
+    const suddenLink = document.getElementById('suddenLink');
+    const pinOverlay = document.getElementById('pinOverlay');
+    const pinPad = document.getElementById('pinPad');
+    const pinError = document.getElementById('pinError');
+    const pinCancel = document.getElementById('pinCancel');
+    let pinInput = '';
+    let suddenHref = '../sudden/';
+
+    function setDots() {
+      for (let i = 0; i < 4; i++) {
+        const d = document.getElementById('pd' + i);
+        if (!d) continue;
+        d.classList.toggle('filled', i < pinInput.length);
+      }
+    }
+
+    function openPin(targetHref) {
+      suddenHref = targetHref || '../sudden/';
+      pinInput = '';
+      setDots();
+      pinError.textContent = '';
+      pinOverlay.classList.add('open');
+      pinOverlay.setAttribute('aria-hidden', 'false');
+    }
+
+    function closePin() {
+      pinOverlay.classList.remove('open');
+      pinOverlay.setAttribute('aria-hidden', 'true');
+      pinInput = '';
+      setDots();
+      pinError.textContent = '';
+    }
+
+    if (suddenLink) {
+      suddenLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (sessionStorage.getItem(SUDDEN_KEY) === '1') {
+          window.location.href = suddenLink.getAttribute('href') || '../sudden/';
+          return;
+        }
+        openPin(suddenLink.getAttribute('href'));
+      });
+    }
+
+    if (pinCancel) pinCancel.addEventListener('click', closePin);
+    if (pinOverlay) {
+      pinOverlay.addEventListener('click', (e) => {
+        if (e.target === pinOverlay) closePin();
+      });
+    }
+
+    if (pinPad) {
+      pinPad.addEventListener('click', (e) => {
+        const k = e.target.closest('.pin-key');
+        if (!k) return;
+        const v = k.getAttribute('data-k');
+        if (v === 'del') {
+          pinInput = pinInput.slice(0, -1);
+          setDots();
+          pinError.textContent = '';
+          return;
+        }
+        if (pinInput.length >= 4) return;
+        pinInput += v;
+        setDots();
+        if (pinInput.length === 4) {
+          if (pinInput === SUDDEN_PIN) {
+            sessionStorage.setItem(SUDDEN_KEY, '1');
+            window.location.href = suddenHref;
+          } else {
+            pinError.textContent = 'Wrong PIN';
+            setTimeout(() => {
+              pinInput = '';
+              setDots();
+              pinError.textContent = '';
+            }, 700);
+          }
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (!pinOverlay.classList.contains('open')) return;
+      if (e.key === 'Escape') { closePin(); return; }
+      if (e.key === 'Backspace') {
+        pinInput = pinInput.slice(0, -1);
+        setDots();
+        pinError.textContent = '';
+        return;
+      }
+      if (!/^\d$/.test(e.key)) return;
+      if (pinInput.length >= 4) return;
+      pinInput += e.key;
+      setDots();
+      if (pinInput.length === 4) {
+        if (pinInput === SUDDEN_PIN) {
+          sessionStorage.setItem(SUDDEN_KEY, '1');
+          window.location.href = suddenHref;
+        } else {
+          pinError.textContent = 'Wrong PIN';
+          setTimeout(() => {
+            pinInput = '';
+            setDots();
+            pinError.textContent = '';
+          }, 700);
+        }
+      }
+    });
+  </script>
 </body>
 </html>
