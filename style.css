@@ -214,7 +214,7 @@ footer{padding:60px 48px;border-top:1px solid var(--muted);display:grid;grid-tem
 .admin-section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;margin-bottom:8px;}
 .admin-section-sub{font-size:13px;color:rgba(240,237,230,.4);margin-bottom:40px;}
 .project-list{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;}
-.project-row{display:flex;align-items:center;gap:20px;background:var(--admin-panel);border:1px solid var(--admin-border);padding:18px 24px;transition:border-color .2s;}
+.project-row{display:flex;align-items:center;gap:20px;background:var(--admin-panel);border:1px solid var(--admin-border);padding:18px 24px;transition:border-color .2s;cursor:pointer;}
 .project-row:hover{border-color:var(--muted);}
 .project-drag-handle{cursor:grab;color:rgba(240,237,230,.2);padding:10px 5px;font-size:16px;user-select:none;}
 .project-drag-handle:active{cursor:grabbing;}

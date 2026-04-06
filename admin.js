@@ -307,6 +307,12 @@ function renderAdminList() {
         <button class="btn-delete" data-id="${p.dbId}">Delete</button>
       </div>
     `;
+    row.addEventListener("click", (e) => {
+      if (e.target.closest(".btn-edit")) return;
+      if (e.target.closest(".btn-delete")) return;
+      if (e.target.closest(".project-drag-handle")) return;
+      editProject(p.dbId);
+    });
     list.appendChild(row);
   });
 
@@ -329,8 +335,21 @@ function renderAdminList() {
     });
   }
 
-  list.querySelectorAll(".btn-edit").forEach((b) => b.addEventListener("click", () => editProject(b.dataset.id)));
-  list.querySelectorAll(".btn-delete").forEach((b) => b.addEventListener("click", () => deleteProject(b.dataset.id)));
+  list.querySelectorAll(".btn-edit").forEach((b) =>
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      editProject(b.dataset.id);
+    })
+  );
+  list.querySelectorAll(".btn-delete").forEach((b) =>
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteProject(b.dataset.id);
+    })
+  );
+  list.querySelectorAll(".project-drag-handle").forEach((h) =>
+    h.addEventListener("click", (e) => e.stopPropagation())
+  );
 }
 
 async function deleteProject(dbId) {
