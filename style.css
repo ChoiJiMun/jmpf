@@ -166,6 +166,9 @@ footer{padding:60px 48px;border-top:1px solid var(--muted);display:grid;grid-tem
 .popup-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,52px);font-weight:400;line-height:1.1;margin-bottom:28px;}
 .popup-desc{font-size:15px;line-height:1.85;color:rgba(240,237,230,.65);font-weight:200;margin-bottom:40px;white-space:pre-wrap;}
 .popup-images{display:flex;flex-direction:column;gap:16px;margin-top:8px;}
+.popup-grid{display:grid;gap:16px;}
+.popup-grid.cols-2{grid-template-columns:1fr 1fr;}
+.popup-grid.cols-3{grid-template-columns:repeat(3,1fr);}
 .popup-embed{width:100%;aspect-ratio:16/9;border:1px solid var(--muted);background:var(--bg);margin:18px 0 6px;}
 .popup-embed iframe{width:100%;height:100%;display:block;}
 .popup-img{display:block;width:100%;height:auto;border:1px solid var(--muted);background:var(--bg);}
@@ -370,6 +373,7 @@ option{background:var(--bg);}
   .popup-overlay{padding:0;}
   .popup-panel{max-width:100%;border-left:none;border-right:none;}
   .popup-body{padding:20px 16px;}
+  .popup-grid.cols-2,.popup-grid.cols-3{grid-template-columns:1fr;}
   
   /* About Popup */
   .about-panel { padding: 40px 20px; }

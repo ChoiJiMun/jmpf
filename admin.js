@@ -18,9 +18,10 @@ const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/ddhkzppo2/image/upload";
 const CLOUDINARY_UPLOAD_PRESET = "jimportfolio";
 
 let projectsCache = [];
-let imagesState = [];
+let mediaState = [];
 let dragFromIndex = null;
 const WORK_CATS = ["UI/UX", "Illustration & Lottie", "3D", "Motion"];
+let selectedMedia = new Set();
 
 function $(id) {
   return document.getElementById(id);
@@ -90,6 +91,51 @@ function normalizeEmbedInput(input) {
   return s;
 }
 
+function isMediaBlock(v) {
+  return v && typeof v === "object" && (v.type === "image" || v.type === "grid");
+}
+
+function normalizeMediaBlocks(blocks) {
+  const raw = Array.isArray(blocks) ? blocks : [];
+  const out = [];
+  raw.forEach((b) => {
+    if (!b) return;
+    if (typeof b === "string") {
+      out.push({ type: "image", url: b });
+      return;
+    }
+    if (b.type === "image" && b.url) {
+      out.push({ type: "image", url: String(b.url) });
+      return;
+    }
+    if (b.type === "grid") {
+      const cols = b.cols === 3 ? 3 : 2;
+      const items = Array.isArray(b.items) ? b.items.map(String).filter(Boolean) : [];
+      if (items.length) out.push({ type: "grid", cols, items });
+    }
+  });
+  return out;
+}
+
+function mediaBlocksFromImages(images) {
+  const list = Array.isArray(images) ? images : [];
+  return list.filter(Boolean).map((url) => ({ type: "image", url: String(url) }));
+}
+
+function flattenMediaBlocks(blocks) {
+  const out = [];
+  normalizeMediaBlocks(blocks).forEach((b) => {
+    if (b.type === "image") out.push(b.url);
+    else out.push(...(b.items || []));
+  });
+  return out.filter(Boolean);
+}
+
+function getCoverUrlFromBlocks(blocks) {
+  const flat = flattenMediaBlocks(blocks);
+  return flat[0] || "";
+}
+
 async function uploadToCloudinary(file) {
   const formData = new FormData();
   formData.append("file", file);
@@ -109,12 +155,17 @@ async function uploadToCloudinary(file) {
 }
 
 function normalizeProject(p) {
-  const rawImages = Array.isArray(p.images) ? p.images : [p.img1, p.img2].filter(Boolean);
+  const blocks = Array.isArray(p.mediaBlocks) ? normalizeMediaBlocks(p.mediaBlocks) : [];
+  const rawImages = flattenMediaBlocks(blocks).length
+    ? flattenMediaBlocks(blocks)
+    : (Array.isArray(p.images) ? p.images : [p.img1, p.img2].filter(Boolean)).slice().filter(Boolean);
   const img = rawImages.slice().filter(Boolean);
   const thumb = p.thumb || "";
   if (!img.length && thumb) img.push(thumb);
   if (thumb && img[0] !== thumb) img.unshift(thumb);
-  return { ...p, images: img, thumb: img[0] || thumb || "" };
+  const mediaBlocks = blocks.length ? blocks : mediaBlocksFromImages(img);
+  const nextThumb = img[0] || thumb || "";
+  return { ...p, images: img, mediaBlocks, thumb: nextThumb };
 }
 
 async function fetchProjectsFromDB() {
@@ -199,19 +250,20 @@ function renderImageList() {
   const list = $("imageList");
   list.innerHTML = "";
 
-  imagesState.forEach((url, idx) => {
+  const blocks = normalizeMediaBlocks(mediaState);
+  mediaState = blocks;
+
+  blocks.forEach((b, idx) => {
     const item = document.createElement("div");
     item.className = "image-item";
     item.draggable = true;
     item.dataset.idx = String(idx);
-
-    const thumb = document.createElement("div");
-    thumb.className = "image-thumb";
-    thumb.style.backgroundImage = `url('${url}')`;
+    item.classList.toggle("selected", selectedMedia.has(idx));
 
     const badge = document.createElement("div");
     badge.className = "image-badge";
-    badge.textContent = idx === 0 ? "Cover" : `#${idx + 1}`;
+    if (idx === 0) badge.textContent = "Cover";
+    else badge.textContent = b.type === "grid" ? `Grid ${b.cols}` : `#${idx + 1}`;
 
     const actions = document.createElement("div");
     actions.className = "image-actions";
@@ -220,13 +272,42 @@ function renderImageList() {
     removeBtn.type = "button";
     removeBtn.className = "image-btn danger";
     removeBtn.textContent = "Remove";
-    removeBtn.addEventListener("click", () => {
-      imagesState = imagesState.filter((_, i) => i !== idx);
+    removeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      mediaState = blocks.filter((_, i) => i !== idx);
+      selectedMedia = new Set(Array.from(selectedMedia).filter((i) => i !== idx).map((i) => (i > idx ? i - 1 : i)));
       renderImageList();
+      updateImageToolbar();
     });
 
     actions.appendChild(removeBtn);
-    item.appendChild(thumb);
+
+    item.addEventListener("click", (e) => {
+      if (e.target.closest(".image-actions")) return;
+      if (selectedMedia.has(idx)) selectedMedia.delete(idx);
+      else selectedMedia.add(idx);
+      renderImageList();
+      updateImageToolbar();
+    });
+
+    if (b.type === "grid") {
+      const grid = document.createElement("div");
+      grid.className = "image-thumb-grid";
+      const items = (b.items || []).slice(0, 4);
+      while (items.length < 4) items.push("");
+      items.forEach((u) => {
+        const cell = document.createElement("span");
+        if (u) cell.style.backgroundImage = `url('${u}')`;
+        grid.appendChild(cell);
+      });
+      item.appendChild(grid);
+    } else {
+      const thumb = document.createElement("div");
+      thumb.className = "image-thumb";
+      thumb.style.backgroundImage = `url('${b.url}')`;
+      item.appendChild(thumb);
+    }
+
     item.appendChild(badge);
     item.appendChild(actions);
 
@@ -248,16 +329,70 @@ function renderImageList() {
       const from = dragFromIndex;
       if (from === null || from === undefined) return;
       if (from === to) return;
-      const next = imagesState.slice();
+      const next = blocks.slice();
       const [moved] = next.splice(from, 1);
       next.splice(to, 0, moved);
-      imagesState = next;
+      mediaState = next;
       dragFromIndex = null;
+      selectedMedia = new Set();
       renderImageList();
+      updateImageToolbar();
     });
 
     list.appendChild(item);
   });
+}
+
+function updateImageToolbar() {
+  const g2 = $("group2Btn");
+  const g3 = $("group3Btn");
+  const ug = $("ungroupBtn");
+  const selected = Array.from(selectedMedia).sort((a, b) => a - b);
+  const blocks = normalizeMediaBlocks(mediaState);
+  const canGroup = selected.length >= 2;
+  const canUngroup = selected.some((i) => blocks[i]?.type === "grid");
+  if (g2) g2.disabled = !canGroup;
+  if (g3) g3.disabled = !canGroup;
+  if (ug) ug.disabled = !canUngroup;
+}
+
+function groupSelected(cols) {
+  const selected = Array.from(selectedMedia).sort((a, b) => a - b);
+  if (selected.length < 2) return;
+  const blocks = normalizeMediaBlocks(mediaState);
+  const urls = [];
+  selected.forEach((i) => {
+    const b = blocks[i];
+    if (!b) return;
+    if (b.type === "image") urls.push(b.url);
+    else urls.push(...(b.items || []));
+  });
+  const min = selected[0];
+  const next = [];
+  for (let i = 0; i < blocks.length; i++) {
+    if (i === min) next.push({ type: "grid", cols: cols === 3 ? 3 : 2, items: urls.filter(Boolean) });
+    if (selected.includes(i)) continue;
+    next.push(blocks[i]);
+  }
+  mediaState = next;
+  selectedMedia = new Set();
+  renderImageList();
+  updateImageToolbar();
+}
+
+function ungroupSelected() {
+  const selected = Array.from(selectedMedia).sort((a, b) => b - a);
+  const blocks = normalizeMediaBlocks(mediaState);
+  selected.forEach((i) => {
+    const b = blocks[i];
+    if (!b || b.type !== "grid") return;
+    const items = (b.items || []).filter(Boolean).map((url) => ({ type: "image", url }));
+    blocks.splice(i, 1, ...items);
+  });
+  mediaState = blocks;
+  selectedMedia = new Set();
+  renderImageList();
+  updateImageToolbar();
 }
 
 async function addImagesFromFiles(files) {
@@ -269,7 +404,8 @@ async function addImagesFromFiles(files) {
   try {
     for (const file of files) {
       const url = await uploadToCloudinary(file);
-      imagesState.push(url);
+      mediaState = normalizeMediaBlocks(mediaState);
+      mediaState.push({ type: "image", url });
       renderImageList();
     }
   } finally {
@@ -292,8 +428,10 @@ function resetForm() {
   $("fUrl").value = "";
   $("fEmbedUrl").value = "";
   $("imageFileInput").value = "";
-  imagesState = [];
+  mediaState = [];
+  selectedMedia = new Set();
   renderImageList();
+  updateImageToolbar();
 }
 
 function openAdd() {
@@ -401,8 +539,10 @@ function editProject(dbId) {
   $("fDesc").value = p.desc || "";
   $("fUrl").value = p.url || "";
   $("fEmbedUrl").value = p.embedUrl || "";
-  imagesState = Array.isArray(p.images) ? p.images.slice() : [];
+  mediaState = Array.isArray(p.mediaBlocks) ? normalizeMediaBlocks(p.mediaBlocks) : mediaBlocksFromImages(Array.isArray(p.images) ? p.images : []);
+  selectedMedia = new Set();
   renderImageList();
+  updateImageToolbar();
   $("formTitle").textContent = "Edit Project";
   $("formSub").textContent = `수정 중: ${p.name || ""}`;
   switchTab("add");
@@ -426,6 +566,9 @@ function initMenu() {
 function initImages() {
   const dropzone = $("imageDropzone");
   const input = $("imageFileInput");
+  const g2 = $("group2Btn");
+  const g3 = $("group3Btn");
+  const ug = $("ungroupBtn");
 
   const openPicker = () => input.click();
   dropzone.addEventListener("click", openPicker);
@@ -455,6 +598,11 @@ function initImages() {
     await addImagesFromFiles(files);
     input.value = "";
   });
+
+  if (g2) g2.addEventListener("click", () => groupSelected(2));
+  if (g3) g3.addEventListener("click", () => groupSelected(3));
+  if (ug) ug.addEventListener("click", () => ungroupSelected());
+  updateImageToolbar();
 }
 
 function initSave() {
@@ -467,7 +615,8 @@ function initSave() {
     }
 
     const editId = $("editId").value.trim();
-    const images = imagesState.slice();
+    const mediaBlocks = normalizeMediaBlocks(mediaState);
+    const images = flattenMediaBlocks(mediaBlocks);
     const workCats = getWorkCatsFromForm();
     const data = {
       name,
@@ -480,6 +629,7 @@ function initSave() {
       shortDesc: $("fShortDesc").value.trim(),
       desc: $("fDesc").value.trim(),
       images,
+      mediaBlocks,
       thumb: images[0] || "",
       url: $("fUrl").value.trim(),
       embedUrl: normalizeEmbedInput($("fEmbedUrl").value)

@@ -3,10 +3,18 @@
 .image-dropzone.dragover{border-color:rgba(200,242,77,.7);background:rgba(200,242,77,.06);}
 .image-dropzone-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(240,237,230,.7);}
 .image-dropzone-sub{font-size:12px;color:rgba(240,237,230,.35);line-height:1.5;}
+.image-toolbar{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.image-tool-btn{background:none;border:1px solid rgba(240,237,230,.18);color:rgba(240,237,230,.75);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:9px 12px;border-radius:999px;cursor:pointer;transition:color .15s,border-color .15s,background .15s;}
+.image-tool-btn:hover{color:var(--accent);border-color:rgba(200,242,77,.45);background:rgba(200,242,77,.06);}
+.image-tool-btn:disabled{opacity:.35;cursor:not-allowed;}
+.image-tool-hint{font-size:12px;color:rgba(240,237,230,.35);margin-left:auto;}
 .image-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
 .image-item{position:relative;border:1px solid rgba(240,237,230,.12);background:rgba(10,10,8,.7);border-radius:10px;overflow:hidden;aspect-ratio:4/3;}
 .image-item.dragging{opacity:.5;}
+.image-item.selected{outline:2px solid rgba(200,242,77,.55);outline-offset:-2px;}
 .image-thumb{position:absolute;inset:0;background-size:cover;background-position:center;}
+.image-thumb-grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(2,1fr);gap:2px;padding:2px;}
+.image-thumb-grid span{background-size:cover;background-position:center;border-radius:4px;}
 .image-badge{position:absolute;top:10px;left:10px;background:rgba(10,10,8,.75);border:1px solid rgba(240,237,230,.18);color:rgba(240,237,230,.8);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;padding:6px 10px;border-radius:999px;}
 .image-actions{position:absolute;bottom:10px;right:10px;display:flex;gap:8px;}
 .image-btn{background:rgba(10,10,8,.7);border:1px solid rgba(240,237,230,.18);color:rgba(240,237,230,.75);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;padding:7px 10px;border-radius:999px;cursor:pointer;transition:color .15s,border-color .15s,background .15s;}

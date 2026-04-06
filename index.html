@@ -326,7 +326,8 @@ async function fetchProjectsFromDB() {
       const thumb = p.thumb || '';
       if (!img.length && thumb) img.push(thumb);
       if (thumb && img[0] !== thumb) img.unshift(thumb);
-      return { ...p, images: img, thumb: img[0] || thumb || '' };
+      const mediaBlocks = Array.isArray(p.mediaBlocks) ? p.mediaBlocks : img.map(u => ({ type: 'image', url: u }));
+      return { ...p, images: img, mediaBlocks, thumb: img[0] || thumb || '' };
     });
     return projects;
   } catch (e) {
@@ -495,16 +496,78 @@ function openPopup(p) {
 
   const imgBox = document.getElementById('pmImages');
   imgBox.innerHTML = '';
-  const images = Array.isArray(p.images) ? p.images : [p.img1, p.img2].filter(Boolean);
-  
-  // 첫 번째 이미지(썸네일/커버)를 제외하고 나머지 이미지만 상세 팝업에 표시
-  const detailImages = images.slice(1);
-  
-  detailImages.forEach(src => {
-    if (src) {
+  const fallbackImages = Array.isArray(p.images) ? p.images : [p.img1, p.img2].filter(Boolean);
+
+  function normalizeBlocks(rawBlocks, fallback) {
+    const out = [];
+    const raw = Array.isArray(rawBlocks) ? rawBlocks : [];
+    if (raw.length) {
+      raw.forEach(b => {
+        if (!b) return;
+        if (typeof b === 'string') { out.push({ type: 'image', url: b }); return; }
+        if (b.type === 'image' && b.url) { out.push({ type: 'image', url: String(b.url) }); return; }
+        if (b.type === 'grid') {
+          const cols = b.cols === 3 ? 3 : 2;
+          const items = Array.isArray(b.items) ? b.items.map(String).filter(Boolean) : [];
+          if (items.length) out.push({ type: 'grid', cols, items });
+        }
+      });
+    } else {
+      (Array.isArray(fallback) ? fallback : []).filter(Boolean).forEach(u => out.push({ type: 'image', url: String(u) }));
+    }
+    return out;
+  }
+
+  function buildDetailBlocks(blocks) {
+    let skipped = false;
+    const out = [];
+    blocks.forEach(b => {
+      if (!b) return;
+      if (b.type === 'image') {
+        if (!skipped) { skipped = true; return; }
+        out.push(b);
+        return;
+      }
+      if (b.type === 'grid') {
+        let items = Array.isArray(b.items) ? b.items.slice() : [];
+        if (!items.length) return;
+        if (!skipped) {
+          items = items.slice(1);
+          skipped = true;
+        }
+        if (!items.length) return;
+        if (items.length === 1) { out.push({ type: 'image', url: items[0] }); return; }
+        out.push({ type: 'grid', cols: b.cols === 3 ? 3 : 2, items });
+      }
+    });
+    return out;
+  }
+
+  const blocks = normalizeBlocks(p.mediaBlocks, fallbackImages);
+  const detailBlocks = buildDetailBlocks(blocks);
+
+  detailBlocks.forEach(b => {
+    if (!b) return;
+    if (b.type === 'grid') {
+      const wrap = document.createElement('div');
+      wrap.className = `popup-grid cols-${b.cols === 3 ? 3 : 2}`;
+      (b.items || []).forEach(src => {
+        if (!src) return;
+        const img = document.createElement('img');
+        img.className = 'popup-img';
+        img.src = src;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        wrap.appendChild(img);
+      });
+      imgBox.appendChild(wrap);
+      return;
+    }
+    if (b.type === 'image' && b.url) {
       const img = document.createElement('img');
       img.className = 'popup-img';
-      img.src = src;
+      img.src = b.url;
       img.alt = '';
       img.loading = 'lazy';
       img.decoding = 'async';
