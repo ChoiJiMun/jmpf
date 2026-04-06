@@ -129,6 +129,21 @@ async function saveProjectsOrder(newOrderIds) {
   await fetchProjectsFromDB();
 }
 
+async function migrateWorkCatsDefault() {
+  let changed = 0;
+  for (const p of projectsCache) {
+    const cats = p.workCats;
+    if (Array.isArray(cats) && cats.length) continue;
+    if (!p.dbId) continue;
+    await updateDoc(doc(db, "projects", p.dbId), { workCats: ["UI/UX"] });
+    changed += 1;
+  }
+  if (changed) {
+    await fetchProjectsFromDB();
+    showToast(`✓ 기존 ${changed}개 프로젝트를 UI/UX로 설정했습니다`);
+  }
+}
+
 async function deleteProjectFromDB(dbId) {
   await deleteDoc(doc(db, "projects", dbId));
   await fetchProjectsFromDB();
@@ -536,6 +551,7 @@ async function init() {
   $("workCats")?.addEventListener("change", syncWorkCatsUI);
 
   await fetchProjectsFromDB();
+  await migrateWorkCatsDefault();
   renderAdminList();
 
   const about = await fetchAboutFromDB();
