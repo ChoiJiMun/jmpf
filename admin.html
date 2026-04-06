@@ -155,8 +155,11 @@
 
             <div class="form-row">
               <label class="form-label">Embed URL (Motion / Video)</label>
-              <input class="form-input" id="fEmbedUrl" placeholder="https://www.youtube.com/embed/... or https://player.vimeo.com/video/...">
-              <div class="form-hint">YouTube/Vimeo embed URL을 넣으면 상세 팝업에 영상이 표시됩니다.</div>
+              <div class="embed-toolbar">
+                <button class="image-tool-btn" type="button" id="addEmbedBtn">Embed 추가</button>
+                <div class="form-hint">URL 또는 iframe 코드를 붙여넣어도 됩니다. 드래그로 순서를 바꿀 수 있습니다.</div>
+              </div>
+              <div class="embed-list" id="embedList"></div>
             </div>
 
             <div class="form-actions">

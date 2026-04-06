@@ -22,6 +22,7 @@ let mediaState = [];
 let dragFromIndex = null;
 const WORK_CATS = ["UI/UX", "Illustration & Lottie", "3D", "Motion"];
 let selectedMedia = new Set();
+let embedState = [];
 
 function $(id) {
   return document.getElementById(id);
@@ -89,6 +90,67 @@ function normalizeEmbedInput(input) {
     s = `https://www.youtube.com/embed/${ytId}`;
   }
   return s;
+}
+
+function renderEmbedList() {
+  const wrap = $("embedList");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  embedState.forEach((v, idx) => {
+    const row = document.createElement("div");
+    row.className = "embed-row";
+    row.dataset.idx = String(idx);
+    row.innerHTML = `
+      <input class="form-input" type="text" placeholder="https://player.vimeo.com/video/... 또는 <iframe ...>" value="">
+      <button class="embed-remove" type="button" aria-label="Remove">×</button>
+    `;
+    const input = row.querySelector("input");
+    const del = row.querySelector("button");
+    input.value = v || "";
+    input.addEventListener("input", () => {
+      embedState[idx] = input.value;
+    });
+    del.addEventListener("click", () => {
+      embedState = embedState.filter((_, i) => i !== idx);
+      renderEmbedList();
+    });
+    wrap.appendChild(row);
+  });
+}
+
+function initEmbeds() {
+  const addBtn = $("addEmbedBtn");
+  if (addBtn) {
+    addBtn.addEventListener("click", () => {
+      embedState = Array.isArray(embedState) ? embedState : [];
+      embedState.push("");
+      renderEmbedList();
+      const wrap = $("embedList");
+      const inputs = wrap ? wrap.querySelectorAll("input") : [];
+      const last = inputs[inputs.length - 1];
+      if (last) last.focus();
+    });
+  }
+
+  const wrap = $("embedList");
+  if (wrap && window.Sortable) {
+    Sortable.create(wrap, {
+      animation: 150,
+      onEnd: (evt) => {
+        const from = evt.oldIndex;
+        const to = evt.newIndex;
+        if (from === undefined || to === undefined) return;
+        if (from === to) return;
+        const next = embedState.slice();
+        const [moved] = next.splice(from, 1);
+        next.splice(to, 0, moved);
+        embedState = next;
+        renderEmbedList();
+      },
+    });
+  }
+
+  renderEmbedList();
 }
 
 function isMediaBlock(v) {
@@ -426,7 +488,8 @@ function resetForm() {
   $("fShortDesc").value = "";
   $("fDesc").value = "";
   $("fUrl").value = "";
-  $("fEmbedUrl").value = "";
+  embedState = [];
+  renderEmbedList();
   $("imageFileInput").value = "";
   mediaState = [];
   selectedMedia = new Set();
@@ -538,7 +601,8 @@ function editProject(dbId) {
   $("fShortDesc").value = p.shortDesc || "";
   $("fDesc").value = p.desc || "";
   $("fUrl").value = p.url || "";
-  $("fEmbedUrl").value = p.embedUrl || "";
+  embedState = Array.isArray(p.embedUrls) ? p.embedUrls.slice() : (p.embedUrl ? [p.embedUrl] : []);
+  renderEmbedList();
   mediaState = Array.isArray(p.mediaBlocks) ? normalizeMediaBlocks(p.mediaBlocks) : mediaBlocksFromImages(Array.isArray(p.images) ? p.images : []);
   selectedMedia = new Set();
   renderImageList();
@@ -618,6 +682,7 @@ function initSave() {
     const mediaBlocks = normalizeMediaBlocks(mediaState);
     const images = flattenMediaBlocks(mediaBlocks);
     const workCats = getWorkCatsFromForm();
+    const embedUrls = (Array.isArray(embedState) ? embedState : []).map(normalizeEmbedInput).filter(Boolean);
     const data = {
       name,
       tag,
@@ -632,7 +697,8 @@ function initSave() {
       mediaBlocks,
       thumb: images[0] || "",
       url: $("fUrl").value.trim(),
-      embedUrl: normalizeEmbedInput($("fEmbedUrl").value)
+      embedUrls,
+      embedUrl: embedUrls[0] || ""
     };
     if (editId) data.dbId = editId;
 
@@ -741,6 +807,7 @@ async function init() {
   initPinGate();
   initMenu();
   initImages();
+  initEmbeds();
   initSave();
   initAbout();
   syncWorkCatsUI();

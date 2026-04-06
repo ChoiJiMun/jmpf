@@ -334,7 +334,8 @@ async function fetchProjectsFromDB() {
       if (!img.length && thumb) img.push(thumb);
       if (thumb && img[0] !== thumb) img.unshift(thumb);
       const mediaBlocks = Array.isArray(p.mediaBlocks) ? p.mediaBlocks : img.map(u => ({ type: 'image', url: u }));
-      return { ...p, images: img, mediaBlocks, thumb: img[0] || thumb || '' };
+      const embedUrls = Array.isArray(p.embedUrls) ? p.embedUrls : (p.embedUrl ? [p.embedUrl] : []);
+      return { ...p, images: img, mediaBlocks, embedUrls, thumb: img[0] || thumb || '' };
     });
     return projects;
   } catch (e) {
@@ -501,8 +502,10 @@ function openPopup(p, opts = {}) {
   const embedWrap = document.getElementById('pmEmbedWrap');
   embedWrap.innerHTML = '';
   embedWrap.style.display = 'none';
-  if (p.embedUrl) {
-    let raw = String(p.embedUrl).trim();
+  const embedInputs = Array.isArray(p.embedUrls) ? p.embedUrls : (p.embedUrl ? [p.embedUrl] : []);
+  const embedSrcs = embedInputs.map((input) => {
+    let raw = String(input || '').trim();
+    if (!raw) return '';
     const m = raw.match(/src\s*=\s*["']([^"']+)["']/i);
     if (m?.[1]) raw = m[1].trim();
     if (
@@ -515,11 +518,16 @@ function openPopup(p, opts = {}) {
     raw = raw.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
     try {
       const u = new URL(raw, window.location.href);
-      if (u.protocol === 'http:' || u.protocol === 'https:') {
-        embedWrap.innerHTML = `<div class="popup-embed"><iframe src="${u.href}" title="Embedded media" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
-        embedWrap.style.display = 'block';
-      }
+      if (u.protocol === 'http:' || u.protocol === 'https:') return u.href;
     } catch {}
+    return '';
+  }).filter(Boolean);
+
+  if (embedSrcs.length) {
+    embedWrap.innerHTML = embedSrcs
+      .map((src) => `<div class="popup-embed"><iframe src="${src}" title="Embedded media" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`)
+      .join('');
+    embedWrap.style.display = 'block';
   }
 
   const imgBox = document.getElementById('pmImages');
