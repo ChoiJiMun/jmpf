@@ -69,6 +69,13 @@
   </div>
 </div>
 
+<div class="imgview-overlay" id="imgViewOverlay" aria-hidden="true">
+  <div class="imgview-panel" role="dialog" aria-modal="true" aria-label="Image view">
+    <button class="imgview-close" id="imgViewClose">×</button>
+    <img class="imgview-img" id="imgViewImg" alt="">
+  </div>
+</div>
+
 <!-- ==================== ABOUT POPUP ==================== -->
 <div class="about-overlay" id="aboutOverlay">
   <div class="about-panel" id="aboutPanel">
@@ -612,6 +619,38 @@ document.getElementById('popupOverlay').addEventListener('click', e => {
   if (e.target === document.getElementById('popupOverlay')) closePopup();
 });
 
+const imgViewOverlay = document.getElementById('imgViewOverlay');
+const imgViewImg = document.getElementById('imgViewImg');
+const imgViewClose = document.getElementById('imgViewClose');
+
+function openImgView(src) {
+  if (!imgViewOverlay || !imgViewImg) return;
+  imgViewImg.src = src;
+  imgViewOverlay.classList.add('open');
+  imgViewOverlay.setAttribute('aria-hidden', 'false');
+}
+
+function closeImgView() {
+  if (!imgViewOverlay || !imgViewImg) return;
+  imgViewOverlay.classList.remove('open');
+  imgViewOverlay.setAttribute('aria-hidden', 'true');
+  imgViewImg.removeAttribute('src');
+}
+
+document.getElementById('pmImages').addEventListener('click', (e) => {
+  const img = e.target.closest('img.popup-img');
+  if (!img) return;
+  if (!img.src) return;
+  openImgView(img.src);
+});
+
+if (imgViewClose) imgViewClose.addEventListener('click', closeImgView);
+if (imgViewOverlay) {
+  imgViewOverlay.addEventListener('click', (e) => {
+    if (e.target === imgViewOverlay) closeImgView();
+  });
+}
+
 function openProjectFromHash() {
   const id = getProjectIdFromHash();
   if (!id) return;
@@ -715,7 +754,7 @@ document.getElementById('pwCancel').addEventListener('click', closePwModal);
 
 /* ESC */
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closePopup(); closePwModal(); }
+  if (e.key === 'Escape') { closeImgView(); closePopup(); closePwModal(); }
 });
 
 /* ===================================================

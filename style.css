@@ -175,6 +175,13 @@ footer{padding:60px 48px;border-top:1px solid var(--muted);display:grid;grid-tem
 .popup-visit{display:inline-flex;align-items:center;gap:10px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);border-bottom:1px solid rgba(200,242,77,.3);padding-bottom:3px;text-decoration:none;transition:gap .2s;}
 .popup-visit:hover{gap:16px;}
 
+.imgview-overlay{position:fixed;inset:0;z-index:9000;background:rgba(10,10,8,.92);display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(10px);}
+.imgview-overlay.open{display:flex;}
+.imgview-panel{position:relative;max-width:95vw;max-height:95vh;}
+.imgview-img{display:block;max-width:95vw;max-height:95vh;width:auto;height:auto;object-fit:contain;border:1px solid rgba(58,58,54,.8);background:var(--bg);}
+.imgview-close{position:absolute;top:-14px;right:-14px;width:40px;height:40px;border-radius:999px;border:1px solid rgba(240,237,230,.25);background:rgba(10,10,8,.75);color:var(--fg);font-size:22px;line-height:1;cursor:pointer;opacity:.7;transition:opacity .2s;}
+.imgview-close:hover{opacity:1;}
+
 /* ============================================================
    PASSWORD MODAL
 ============================================================ */
