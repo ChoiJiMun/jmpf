@@ -63,6 +63,33 @@ function setWorkCatsInForm(cats) {
   syncWorkCatsUI();
 }
 
+function normalizeEmbedInput(input) {
+  let s = String(input || "").trim();
+  if (!s) return "";
+  if (
+    (s.startsWith("`") && s.endsWith("`")) ||
+    (s.startsWith("\"") && s.endsWith("\"")) ||
+    (s.startsWith("'") && s.endsWith("'"))
+  ) {
+    s = s.slice(1, -1).trim();
+  }
+  if (/^<iframe[\s\S]*?>/i.test(s)) {
+    const m = s.match(/src\s*=\s*["']([^"']+)["']/i);
+    s = (m?.[1] || "").trim();
+  }
+  if (!s) return "";
+  s = s.replace(/&amp;/g, "&").replace(/&quot;/g, "\"").replace(/&#39;/g, "'");
+  const vimeoId = s.match(/vimeo\.com\/(?:video\/)?(\d+)/i)?.[1];
+  if (vimeoId && !/player\.vimeo\.com\/video\//i.test(s)) {
+    s = `https://player.vimeo.com/video/${vimeoId}`;
+  }
+  const ytId = s.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/i)?.[1];
+  if (ytId && !/youtube\.com\/embed\//i.test(s)) {
+    s = `https://www.youtube.com/embed/${ytId}`;
+  }
+  return s;
+}
+
 async function uploadToCloudinary(file) {
   const formData = new FormData();
   formData.append("file", file);
@@ -455,7 +482,7 @@ function initSave() {
       images,
       thumb: images[0] || "",
       url: $("fUrl").value.trim(),
-      embedUrl: $("fEmbedUrl").value.trim()
+      embedUrl: normalizeEmbedInput($("fEmbedUrl").value)
     };
     if (editId) data.dbId = editId;
 

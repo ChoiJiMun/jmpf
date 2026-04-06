@@ -473,8 +473,19 @@ function openPopup(p) {
   embedWrap.innerHTML = '';
   embedWrap.style.display = 'none';
   if (p.embedUrl) {
+    let raw = String(p.embedUrl).trim();
+    const m = raw.match(/src\s*=\s*["']([^"']+)["']/i);
+    if (m?.[1]) raw = m[1].trim();
+    if (
+      (raw.startsWith('`') && raw.endsWith('`')) ||
+      (raw.startsWith('"') && raw.endsWith('"')) ||
+      (raw.startsWith("'") && raw.endsWith("'"))
+    ) {
+      raw = raw.slice(1, -1).trim();
+    }
+    raw = raw.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
     try {
-      const u = new URL(p.embedUrl, window.location.href);
+      const u = new URL(raw, window.location.href);
       if (u.protocol === 'http:' || u.protocol === 'https:') {
         embedWrap.innerHTML = `<div class="popup-embed"><iframe src="${u.href}" title="Embedded media" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
         embedWrap.style.display = 'block';
