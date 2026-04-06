@@ -216,6 +216,7 @@ function resetForm() {
   $("fShortDesc").value = "";
   $("fDesc").value = "";
   $("fUrl").value = "";
+  $("fEmbedUrl").value = "";
   $("imageFileInput").value = "";
   imagesState = [];
   renderImageList();
@@ -305,6 +306,7 @@ function editProject(dbId) {
   $("fShortDesc").value = p.shortDesc || "";
   $("fDesc").value = p.desc || "";
   $("fUrl").value = p.url || "";
+  $("fEmbedUrl").value = p.embedUrl || "";
   imagesState = Array.isArray(p.images) ? p.images.slice() : [];
   renderImageList();
   $("formTitle").textContent = "Edit Project";
@@ -383,7 +385,8 @@ function initSave() {
       desc: $("fDesc").value.trim(),
       images,
       thumb: images[0] || "",
-      url: $("fUrl").value.trim()
+      url: $("fUrl").value.trim(),
+      embedUrl: $("fEmbedUrl").value.trim()
     };
     if (editId) data.dbId = editId;
 

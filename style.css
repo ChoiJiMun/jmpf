@@ -22,6 +22,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .nav-links a:hover{opacity:1;}
 .nav-cta{border:1px solid rgba(240,237,230,.3);padding:10px 24px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);text-decoration:none;transition:background .3s,color .3s;}
 .nav-cta:hover{background:var(--accent);border-color:var(--accent);color:var(--bg);}
+.nav-dropdown{position:relative;}
+.nav-submenu{position:absolute;top:calc(100% + 14px);left:0;min-width:220px;background:rgba(10,10,8,.92);backdrop-filter:blur(16px);border:1px solid rgba(58,58,54,.6);padding:12px;border-radius:10px;display:none;flex-direction:column;gap:6px;z-index:999;}
+.nav-dropdown:hover .nav-submenu{display:flex;}
+.nav-dropdown.open .nav-submenu{display:flex;}
+.nav-submenu a{display:block;padding:10px 12px;border-radius:8px;opacity:.75;font-size:12px;letter-spacing:.12em;text-transform:uppercase;}
+.nav-submenu a:hover{background:rgba(200,242,77,.06);opacity:1;}
+.nav-submenu a.active{background:rgba(200,242,77,.12);opacity:1;color:var(--accent);}
 
 /* HERO */
 .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 48px 80px;position:relative;overflow:hidden;}
@@ -158,6 +165,8 @@ footer{padding:60px 48px;border-top:1px solid var(--muted);display:grid;grid-tem
 .popup-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,52px);font-weight:400;line-height:1.1;margin-bottom:28px;}
 .popup-desc{font-size:15px;line-height:1.85;color:rgba(240,237,230,.65);font-weight:200;margin-bottom:40px;white-space:pre-wrap;}
 .popup-images{display:flex;flex-direction:column;gap:16px;margin-top:8px;}
+.popup-embed{width:100%;aspect-ratio:16/9;border:1px solid var(--muted);background:var(--bg);margin:18px 0 6px;}
+.popup-embed iframe{width:100%;height:100%;display:block;}
 .popup-img{display:block;width:100%;height:auto;border:1px solid var(--muted);background:var(--bg);}
 .popup-visit{display:inline-flex;align-items:center;gap:10px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);border-bottom:1px solid rgba(200,242,77,.3);padding-bottom:3px;text-decoration:none;transition:gap .2s;}
 .popup-visit:hover{gap:16px;}
@@ -321,6 +330,11 @@ option{background:var(--bg);}
   .nav-links.open { right: 0; }
   .nav-links a { font-size: 18px; }
   .nav-cta { display: none; } /* Hide CTA in header on mobile, or move to menu */
+  .nav-dropdown{width:100%;}
+  .nav-submenu{position:static;display:none;background:transparent;border:none;padding:0;margin-top:12px;backdrop-filter:none;}
+  .nav-dropdown.open .nav-submenu{display:flex;}
+  .nav-submenu a{font-size:14px;padding:10px 0;border-radius:0;}
+  .nav-submenu a.active{background:transparent;color:var(--accent);}
 
   /* Hero */
   .hero-title { font-size: clamp(48px, 12vw, 80px); margin-bottom: 40px; }
@@ -352,6 +366,9 @@ option{background:var(--bg);}
   .popup-body { grid-template-columns: 1fr; gap: 40px; padding: 32px 20px; }
   .popup-images { grid-template-columns: 1fr; }
   .popup-title { font-size: 32px; }
+  .popup-overlay{padding:0;}
+  .popup-panel{max-width:100%;border-left:none;border-right:none;}
+  .popup-body{padding:20px 16px;}
   
   /* About Popup */
   .about-panel { padding: 40px 20px; }
