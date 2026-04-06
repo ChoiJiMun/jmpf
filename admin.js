@@ -20,6 +20,7 @@ const CLOUDINARY_UPLOAD_PRESET = "jimportfolio";
 let projectsCache = [];
 let imagesState = [];
 let dragFromIndex = null;
+const WORK_CATS = ["UI/UX", "Illustration & Lottie", "3D", "Motion"];
 
 function $(id) {
   return document.getElementById(id);
@@ -30,6 +31,36 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+function syncWorkCatsUI() {
+  const wrap = $("workCats");
+  if (!wrap) return;
+  wrap.querySelectorAll(".cat-chip").forEach((label) => {
+    const input = label.querySelector("input[type=\"checkbox\"]");
+    if (!input) return;
+    label.classList.toggle("checked", input.checked);
+  });
+}
+
+function getWorkCatsFromForm() {
+  const wrap = $("workCats");
+  if (!wrap) return ["UI/UX"];
+  const checked = Array.from(wrap.querySelectorAll("input[type=\"checkbox\"]"))
+    .filter((i) => i.checked)
+    .map((i) => i.value)
+    .filter(Boolean);
+  return checked.length ? checked : ["UI/UX"];
+}
+
+function setWorkCatsInForm(cats) {
+  const wrap = $("workCats");
+  if (!wrap) return;
+  const set = new Set(Array.isArray(cats) ? cats : []);
+  wrap.querySelectorAll("input[type=\"checkbox\"]").forEach((i) => {
+    i.checked = set.size ? set.has(i.value) : i.value === "UI/UX";
+  });
+  syncWorkCatsUI();
 }
 
 async function uploadToCloudinary(file) {
@@ -209,6 +240,7 @@ function resetForm() {
   $("editId").value = "";
   $("fName").value = "";
   $("fTag").value = "";
+  setWorkCatsInForm(["UI/UX"]);
   $("fYear").value = "";
   $("fClient").value = "";
   $("fSize").value = "normal";
@@ -299,6 +331,7 @@ function editProject(dbId) {
   $("editId").value = p.dbId;
   $("fName").value = p.name || "";
   $("fTag").value = p.tag || "";
+  setWorkCatsInForm(Array.isArray(p.workCats) ? p.workCats : ["UI/UX"]);
   $("fYear").value = p.year || "";
   $("fClient").value = p.client || "";
   $("fSize").value = p.size || "normal";
@@ -374,9 +407,11 @@ function initSave() {
 
     const editId = $("editId").value.trim();
     const images = imagesState.slice();
+    const workCats = getWorkCatsFromForm();
     const data = {
       name,
       tag,
+      workCats,
       year: $("fYear").value.trim(),
       client: $("fClient").value.trim(),
       size: $("fSize").value,
@@ -497,6 +532,8 @@ async function init() {
   initImages();
   initSave();
   initAbout();
+  syncWorkCatsUI();
+  $("workCats")?.addEventListener("change", syncWorkCatsUI);
 
   await fetchProjectsFromDB();
   renderAdminList();

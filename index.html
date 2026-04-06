@@ -385,6 +385,9 @@ function normalizeFilterValue(v) {
 function matchWorkFilter(p, filter) {
   const f = normalizeFilterValue(filter);
   if (!f || f === 'all') return true;
+  const cats = Array.isArray(p.workCats) ? p.workCats : [];
+  const catSet = new Set(cats.map(normalizeFilterValue));
+  if (catSet.size) return catSet.has(f);
   const tag = normalizeFilterValue(p.tag);
   if (!tag) return false;
   if (tag === f) return true;
