@@ -456,8 +456,29 @@ async function renderProjects() {
 /* ===================================================
    PROJECT POPUP
 =================================================== */
-function openPopup(p) {
+let currentPopupProjectId = null;
+
+function getProjectIdFromHash() {
+  const raw = window.location.hash ? window.location.hash.slice(1) : '';
+  const params = new URLSearchParams(raw);
+  const v = params.get('p');
+  return v ? String(v) : null;
+}
+
+function setProjectIdToHash(dbId) {
+  const url = new URL(window.location.href);
+  const params = new URLSearchParams(url.hash ? url.hash.slice(1) : '');
+  if (dbId) params.set('p', String(dbId));
+  else params.delete('p');
+  const next = params.toString();
+  url.hash = next ? next : '';
+  history.replaceState(null, '', url.toString());
+}
+
+function openPopup(p, opts = {}) {
   const overlay = document.getElementById('popupOverlay');
+  if (!opts.skipHash && p?.dbId) setProjectIdToHash(p.dbId);
+  currentPopupProjectId = p?.dbId || null;
 
   document.getElementById('pmTag').textContent    = p.tag;
   document.getElementById('pmYear').textContent   = p.year || '—';
@@ -579,14 +600,34 @@ function openPopup(p) {
   document.body.style.overflow = 'hidden';
 }
 
-function closePopup() {
+function closePopup(opts = {}) {
   document.getElementById('popupOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  if (!opts.skipHash) setProjectIdToHash(null);
+  currentPopupProjectId = null;
 }
 
 document.getElementById('popupClose').addEventListener('click', closePopup);
 document.getElementById('popupOverlay').addEventListener('click', e => {
   if (e.target === document.getElementById('popupOverlay')) closePopup();
+});
+
+function openProjectFromHash() {
+  const id = getProjectIdFromHash();
+  if (!id) return;
+  const p = (localProjects || []).find(x => String(x.dbId) === id);
+  if (!p) return;
+  if (currentPopupProjectId === p.dbId) return;
+  openPopup(p, { skipHash: true });
+}
+
+window.addEventListener('hashchange', () => {
+  const id = getProjectIdFromHash();
+  if (!id) {
+    if (currentPopupProjectId) closePopup({ skipHash: true });
+    return;
+  }
+  openProjectFromHash();
 });
 
 /* ===================================================
@@ -822,6 +863,7 @@ fetchProjectsFromDB().then(() => {
   renderProjects();
   setWorkFilter(workFilter);
   fetchAboutFromDB();
+  openProjectFromHash();
 });
 </script>
 </body>
