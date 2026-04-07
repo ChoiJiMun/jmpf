@@ -23,6 +23,8 @@ let dragFromIndex = null;
 const WORK_CATS = ["UI/UX", "Illustration & Lottie", "3D", "Motion"];
 let selectedMedia = new Set();
 let embedState = [];
+let gridLinkEditingIndex = null;
+let gridLinkDraft = [];
 
 function $(id) {
   return document.getElementById(id);
@@ -92,6 +94,28 @@ function normalizeEmbedInput(input) {
   return s;
 }
 
+function normalizeLinkInput(input) {
+  let s = String(input || "").trim();
+  if (!s) return "";
+  if (
+    (s.startsWith("`") && s.endsWith("`")) ||
+    (s.startsWith("\"") && s.endsWith("\"")) ||
+    (s.startsWith("'") && s.endsWith("'"))
+  ) {
+    s = s.slice(1, -1).trim();
+  }
+  if (/^<a[\s\S]*?>/i.test(s)) {
+    const m = s.match(/href\s*=\s*["']([^"']+)["']/i);
+    s = (m?.[1] || "").trim();
+  }
+  s = s.replace(/&amp;/g, "&").replace(/&quot;/g, "\"").replace(/&#39;/g, "'");
+  try {
+    const u = new URL(s);
+    if (u.protocol === "http:" || u.protocol === "https:") return u.href;
+  } catch {}
+  return "";
+}
+
 function renderEmbedList() {
   const wrap = $("embedList");
   if (!wrap) return;
@@ -153,6 +177,61 @@ function initEmbeds() {
   renderEmbedList();
 }
 
+function openGridLinkEditor(idx) {
+  const overlay = $("gridLinkOverlay");
+  const list = $("gridLinkList");
+  if (!overlay || !list) return;
+  const blocks = normalizeMediaBlocks(mediaState);
+  const b = blocks[idx];
+  if (!b || b.type !== "grid") return;
+  gridLinkEditingIndex = idx;
+  gridLinkDraft = (b.items || []).map((it) => ({
+    url: String(it?.url || ""),
+    linkUrl: it?.linkUrl ? String(it.linkUrl) : ""
+  }));
+  list.innerHTML = "";
+  gridLinkDraft.forEach((it, i) => {
+    const row = document.createElement("div");
+    row.className = "gridlink-row";
+    row.innerHTML = `
+      <div class="gridlink-thumb"></div>
+      <input class="form-input" type="text" placeholder="https://... (새창)" value="">
+    `;
+    const thumb = row.querySelector(".gridlink-thumb");
+    const input = row.querySelector("input");
+    thumb.style.backgroundImage = it.url ? `url('${it.url}')` : "";
+    input.value = it.linkUrl || "";
+    input.addEventListener("input", () => {
+      gridLinkDraft[i].linkUrl = input.value;
+    });
+    list.appendChild(row);
+  });
+  overlay.classList.add("open");
+}
+
+function closeGridLinkEditor() {
+  const overlay = $("gridLinkOverlay");
+  if (!overlay) return;
+  overlay.classList.remove("open");
+  gridLinkEditingIndex = null;
+  gridLinkDraft = [];
+}
+
+function saveGridLinkEditor() {
+  if (gridLinkEditingIndex === null) return;
+  const blocks = normalizeMediaBlocks(mediaState);
+  const b = blocks[gridLinkEditingIndex];
+  if (!b || b.type !== "grid") return;
+  b.items = gridLinkDraft.map((it) => {
+    const linkUrl = normalizeLinkInput(it.linkUrl);
+    return { url: it.url, ...(linkUrl ? { linkUrl } : {}) };
+  });
+  mediaState = blocks;
+  renderImageList();
+  updateImageToolbar();
+  closeGridLinkEditor();
+}
+
 function isMediaBlock(v) {
   return v && typeof v === "object" && (v.type === "image" || v.type === "grid");
 }
@@ -167,12 +246,25 @@ function normalizeMediaBlocks(blocks) {
       return;
     }
     if (b.type === "image" && b.url) {
-      out.push({ type: "image", url: String(b.url) });
+      const linkUrl = b.linkUrl ? normalizeLinkInput(b.linkUrl) : "";
+      out.push({ type: "image", url: String(b.url), ...(linkUrl ? { linkUrl } : {}) });
       return;
     }
     if (b.type === "grid") {
       const cols = b.cols === 3 ? 3 : 2;
-      const items = Array.isArray(b.items) ? b.items.map(String).filter(Boolean) : [];
+      const items = Array.isArray(b.items)
+        ? b.items
+            .map((it) => {
+              if (!it) return null;
+              if (typeof it === "string") return { url: String(it) };
+              if (typeof it === "object" && it.url) {
+                const linkUrl = it.linkUrl ? normalizeLinkInput(it.linkUrl) : "";
+                return { url: String(it.url), ...(linkUrl ? { linkUrl } : {}) };
+              }
+              return null;
+            })
+            .filter(Boolean)
+        : [];
       if (items.length) out.push({ type: "grid", cols, items });
     }
   });
@@ -188,7 +280,7 @@ function flattenMediaBlocks(blocks) {
   const out = [];
   normalizeMediaBlocks(blocks).forEach((b) => {
     if (b.type === "image") out.push(b.url);
-    else out.push(...(b.items || []));
+    else out.push(...(b.items || []).map((it) => (typeof it === "string" ? it : it?.url)));
   });
   return out.filter(Boolean);
 }
@@ -330,6 +422,34 @@ function renderImageList() {
     const actions = document.createElement("div");
     actions.className = "image-actions";
 
+    if (b.type === "image") {
+      const linkBtn = document.createElement("button");
+      linkBtn.type = "button";
+      linkBtn.className = "image-btn dim";
+      linkBtn.textContent = "Link";
+      linkBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const next = prompt("Image Link URL (새창)", b.linkUrl || "");
+        const linkUrl = normalizeLinkInput(next);
+        const nextBlocks = normalizeMediaBlocks(mediaState);
+        nextBlocks[idx] = { type: "image", url: b.url, ...(linkUrl ? { linkUrl } : {}) };
+        mediaState = nextBlocks;
+        renderImageList();
+        updateImageToolbar();
+      });
+      actions.appendChild(linkBtn);
+    } else if (b.type === "grid") {
+      const linksBtn = document.createElement("button");
+      linksBtn.type = "button";
+      linksBtn.className = "image-btn dim";
+      linksBtn.textContent = "Links";
+      linksBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openGridLinkEditor(idx);
+      });
+      actions.appendChild(linksBtn);
+    }
+
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
     removeBtn.className = "image-btn danger";
@@ -355,10 +475,11 @@ function renderImageList() {
     if (b.type === "grid") {
       const grid = document.createElement("div");
       grid.className = "image-thumb-grid";
-      const items = (b.items || []).slice(0, 4);
-      while (items.length < 4) items.push("");
-      items.forEach((u) => {
+      const items = (b.items || []).slice(0, 4).map((it) => (typeof it === "string" ? { url: it } : it));
+      while (items.length < 4) items.push({ url: "" });
+      items.forEach((it) => {
         const cell = document.createElement("span");
+        const u = it?.url || "";
         if (u) cell.style.backgroundImage = `url('${u}')`;
         grid.appendChild(cell);
       });
@@ -368,6 +489,13 @@ function renderImageList() {
       thumb.className = "image-thumb";
       thumb.style.backgroundImage = `url('${b.url}')`;
       item.appendChild(thumb);
+    }
+
+    if (b.type === "image" && b.linkUrl) {
+      const lb = document.createElement("div");
+      lb.className = "image-link-badge";
+      lb.textContent = "LINK";
+      item.appendChild(lb);
     }
 
     item.appendChild(badge);
@@ -422,17 +550,17 @@ function groupSelected(cols) {
   const selected = Array.from(selectedMedia).sort((a, b) => a - b);
   if (selected.length < 2) return;
   const blocks = normalizeMediaBlocks(mediaState);
-  const urls = [];
+  const items = [];
   selected.forEach((i) => {
     const b = blocks[i];
     if (!b) return;
-    if (b.type === "image") urls.push(b.url);
-    else urls.push(...(b.items || []));
+    if (b.type === "image") items.push({ url: b.url, ...(b.linkUrl ? { linkUrl: b.linkUrl } : {}) });
+    else items.push(...(b.items || []).map((it) => (typeof it === "string" ? { url: it } : it)));
   });
   const min = selected[0];
   const next = [];
   for (let i = 0; i < blocks.length; i++) {
-    if (i === min) next.push({ type: "grid", cols: cols === 3 ? 3 : 2, items: urls.filter(Boolean) });
+    if (i === min) next.push({ type: "grid", cols: cols === 3 ? 3 : 2, items: items.filter((it) => it?.url) });
     if (selected.includes(i)) continue;
     next.push(blocks[i]);
   }
@@ -448,7 +576,11 @@ function ungroupSelected() {
   selected.forEach((i) => {
     const b = blocks[i];
     if (!b || b.type !== "grid") return;
-    const items = (b.items || []).filter(Boolean).map((url) => ({ type: "image", url }));
+    const items = (b.items || [])
+      .filter(Boolean)
+      .map((it) => (typeof it === "string" ? { url: it } : it))
+      .filter((it) => it?.url)
+      .map((it) => ({ type: "image", url: it.url, ...(it.linkUrl ? { linkUrl: it.linkUrl } : {}) }));
     blocks.splice(i, 1, ...items);
   });
   mediaState = blocks;
@@ -803,11 +935,27 @@ function initPinGate() {
   open();
 }
 
+function initGridLinkEditor() {
+  const closeBtn = $("gridLinkClose");
+  const cancelBtn = $("gridLinkCancel");
+  const saveBtn = $("gridLinkSave");
+  const overlay = $("gridLinkOverlay");
+  if (closeBtn) closeBtn.addEventListener("click", closeGridLinkEditor);
+  if (cancelBtn) cancelBtn.addEventListener("click", closeGridLinkEditor);
+  if (saveBtn) saveBtn.addEventListener("click", saveGridLinkEditor);
+  if (overlay) {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeGridLinkEditor();
+    });
+  }
+}
+
 async function init() {
   initPinGate();
   initMenu();
   initImages();
   initEmbeds();
+  initGridLinkEditor();
   initSave();
   initAbout();
   syncWorkCatsUI();

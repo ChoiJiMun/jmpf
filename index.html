@@ -541,10 +541,26 @@ function openPopup(p, opts = {}) {
       raw.forEach(b => {
         if (!b) return;
         if (typeof b === 'string') { out.push({ type: 'image', url: b }); return; }
-        if (b.type === 'image' && b.url) { out.push({ type: 'image', url: String(b.url) }); return; }
+        if (b.type === 'image' && b.url) {
+          const linkUrl = b.linkUrl ? String(b.linkUrl) : '';
+          out.push({ type: 'image', url: String(b.url), ...(linkUrl ? { linkUrl } : {}) });
+          return;
+        }
         if (b.type === 'grid') {
           const cols = b.cols === 3 ? 3 : 2;
-          const items = Array.isArray(b.items) ? b.items.map(String).filter(Boolean) : [];
+          const items = Array.isArray(b.items)
+            ? b.items
+                .map(it => {
+                  if (!it) return null;
+                  if (typeof it === 'string') return { url: String(it) };
+                  if (typeof it === 'object' && it.url) {
+                    const linkUrl = it.linkUrl ? String(it.linkUrl) : '';
+                    return { url: String(it.url), ...(linkUrl ? { linkUrl } : {}) };
+                  }
+                  return null;
+                })
+                .filter(Boolean)
+            : [];
           if (items.length) out.push({ type: 'grid', cols, items });
         }
       });
@@ -572,7 +588,7 @@ function openPopup(p, opts = {}) {
           skipped = true;
         }
         if (!items.length) return;
-        if (items.length === 1) { out.push({ type: 'image', url: items[0] }); return; }
+        if (items.length === 1) { out.push({ type: 'image', url: items[0].url, ...(items[0].linkUrl ? { linkUrl: items[0].linkUrl } : {}) }); return; }
         out.push({ type: 'grid', cols: b.cols === 3 ? 3 : 2, items });
       }
     });
@@ -587,7 +603,9 @@ function openPopup(p, opts = {}) {
     if (b.type === 'grid') {
       const wrap = document.createElement('div');
       wrap.className = `popup-grid cols-${b.cols === 3 ? 3 : 2}`;
-      (b.items || []).forEach(src => {
+      (b.items || []).forEach(it => {
+        const src = it?.url;
+        const linkUrl = it?.linkUrl;
         if (!src) return;
         const img = document.createElement('img');
         img.className = 'popup-img';
@@ -595,7 +613,17 @@ function openPopup(p, opts = {}) {
         img.alt = '';
         img.loading = 'lazy';
         img.decoding = 'async';
-        wrap.appendChild(img);
+        if (linkUrl) {
+          const a = document.createElement('a');
+          a.className = 'popup-img-link';
+          a.href = linkUrl;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.appendChild(img);
+          wrap.appendChild(a);
+        } else {
+          wrap.appendChild(img);
+        }
       });
       imgBox.appendChild(wrap);
       return;
@@ -607,7 +635,17 @@ function openPopup(p, opts = {}) {
       img.alt = '';
       img.loading = 'lazy';
       img.decoding = 'async';
-      imgBox.appendChild(img);
+      if (b.linkUrl) {
+        const a = document.createElement('a');
+        a.className = 'popup-img-link';
+        a.href = b.linkUrl;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.appendChild(img);
+        imgBox.appendChild(a);
+      } else {
+        imgBox.appendChild(img);
+      }
     }
   });
 
@@ -646,6 +684,7 @@ function closeImgView() {
 }
 
 document.getElementById('pmImages').addEventListener('click', (e) => {
+  if (e.target.closest('a.popup-img-link')) return;
   const img = e.target.closest('img.popup-img');
   if (!img) return;
   if (!img.src) return;
