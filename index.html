@@ -63,6 +63,7 @@
         <h2 class="popup-title" id="pmTitle"></h2>
         <p class="popup-desc" id="pmDesc"></p>
         <div class="popup-embed-wrap" id="pmEmbedWrap" style="display:none;"></div>
+        <div class="popup-html-wrap" id="pmHtmlWrap" style="display:none;"></div>
         <div class="popup-images" id="pmImages"></div>
       </div>
     </div>
@@ -162,6 +163,7 @@
         <a href="#work" data-filter="Illustration & Lottie">Illustration & Lottie</a>
         <a href="#work" data-filter="3D">3D</a>
         <a href="#work" data-filter="Motion">Motion</a>
+        <a href="#work" data-filter="Framer">Framer</a>
       </div>
     </li>
     <!-- <li><a href="#contact">Contact</a></li> -->
@@ -335,7 +337,8 @@ async function fetchProjectsFromDB() {
       if (thumb && img[0] !== thumb) img.unshift(thumb);
       const mediaBlocks = Array.isArray(p.mediaBlocks) ? p.mediaBlocks : img.map(u => ({ type: 'image', url: u }));
       const embedUrls = Array.isArray(p.embedUrls) ? p.embedUrls : (p.embedUrl ? [p.embedUrl] : []);
-      return { ...p, images: img, mediaBlocks, embedUrls, thumb: img[0] || thumb || '' };
+      const customHtml = p.customHtml ? String(p.customHtml) : '';
+      return { ...p, images: img, mediaBlocks, embedUrls, customHtml, thumb: img[0] || thumb || '' };
     });
     return projects;
   } catch (e) {
@@ -528,6 +531,19 @@ function openPopup(p, opts = {}) {
       .map((src) => `<div class="popup-embed"><iframe src="${src}" title="Embedded media" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`)
       .join('');
     embedWrap.style.display = 'block';
+  }
+
+  const htmlWrap = document.getElementById('pmHtmlWrap');
+  htmlWrap.innerHTML = '';
+  htmlWrap.style.display = 'none';
+  if (p.customHtml && String(p.customHtml).trim()) {
+    const iframe = document.createElement('iframe');
+    iframe.className = 'popup-html-iframe';
+    iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox');
+    iframe.setAttribute('loading', 'lazy');
+    iframe.srcdoc = String(p.customHtml);
+    htmlWrap.appendChild(iframe);
+    htmlWrap.style.display = 'block';
   }
 
   const imgBox = document.getElementById('pmImages');

@@ -620,6 +620,7 @@ function resetForm() {
   $("fShortDesc").value = "";
   $("fDesc").value = "";
   $("fUrl").value = "";
+  $("fCustomHtml").value = "";
   embedState = [];
   renderEmbedList();
   $("imageFileInput").value = "";
@@ -733,6 +734,7 @@ function editProject(dbId) {
   $("fShortDesc").value = p.shortDesc || "";
   $("fDesc").value = p.desc || "";
   $("fUrl").value = p.url || "";
+  $("fCustomHtml").value = p.customHtml || "";
   embedState = Array.isArray(p.embedUrls) ? p.embedUrls.slice() : (p.embedUrl ? [p.embedUrl] : []);
   renderEmbedList();
   mediaState = Array.isArray(p.mediaBlocks) ? normalizeMediaBlocks(p.mediaBlocks) : mediaBlocksFromImages(Array.isArray(p.images) ? p.images : []);
@@ -825,6 +827,7 @@ function initSave() {
       color: $("fColor").value,
       shortDesc: $("fShortDesc").value.trim(),
       desc: $("fDesc").value.trim(),
+      customHtml: $("fCustomHtml").value || "",
       images,
       mediaBlocks,
       thumb: images[0] || "",

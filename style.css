@@ -171,6 +171,8 @@ footer{padding:60px 48px;border-top:1px solid var(--muted);display:grid;grid-tem
 .popup-grid.cols-3{grid-template-columns:repeat(3,1fr);}
 .popup-embed{width:100%;aspect-ratio:16/9;border:1px solid var(--muted);background:var(--bg);margin:18px 0 6px;}
 .popup-embed iframe{width:100%;height:100%;display:block;}
+.popup-html-wrap{margin:18px 0 6px;}
+.popup-html-iframe{width:100%;height:min(70vh,900px);border:1px solid var(--muted);background:var(--bg);display:block;}
 .popup-img-link{display:block;text-decoration:none;}
 .popup-img{display:block;width:auto;max-width:100%;height:auto;margin:0 auto;border:1px solid var(--muted);background:var(--bg);}
 .popup-grid .popup-img-link{width:100%;}
