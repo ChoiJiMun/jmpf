@@ -319,7 +319,7 @@ function normalizeProject(p) {
   if (thumb && img[0] !== thumb) img.unshift(thumb);
   const mediaBlocks = blocks.length ? blocks : mediaBlocksFromImages(img);
   const nextThumb = img[0] || thumb || "";
-  return { ...p, images: img, mediaBlocks, thumb: nextThumb };
+  return { ...p, hidden: !!p.hidden, images: img, mediaBlocks, thumb: nextThumb };
 }
 
 async function fetchProjectsFromDB() {
@@ -621,6 +621,7 @@ function resetForm() {
   $("fDesc").value = "";
   $("fUrl").value = "";
   $("fCustomHtml").value = "";
+  $("fHidden").checked = false;
   embedState = [];
   renderEmbedList();
   $("imageFileInput").value = "";
@@ -656,14 +657,16 @@ function renderAdminList() {
     const thumbStyle = thumb
       ? `background-image:url('${thumb}');background-size:cover;background-position:center;`
       : `background:${BG[ci]};`;
+    const hiddenPill = p.hidden ? ` <span class="hidden-pill">HIDDEN</span>` : "";
     row.innerHTML = `
       <div class="project-drag-handle">⋮⋮</div>
       <div class="project-row-thumb" style="${thumbStyle}">${!thumb ? "no img" : ""}</div>
       <div class="project-row-info">
         <div class="project-row-name">${p.name || ""}</div>
-        <div class="project-row-tag">${p.tag || ""}${p.year ? " · " + p.year : ""}${p.size === "large" ? " · LARGE" : ""}</div>
+        <div class="project-row-tag">${p.tag || ""}${p.year ? " · " + p.year : ""}${p.size === "large" ? " · LARGE" : ""}${hiddenPill}</div>
       </div>
       <div class="project-row-actions">
+        <button class="btn-toggle" data-id="${p.dbId}">${p.hidden ? "Show" : "Hide"}</button>
         <button class="btn-edit" data-id="${p.dbId}">Edit</button>
         <button class="btn-delete" data-id="${p.dbId}">Delete</button>
       </div>
@@ -702,6 +705,23 @@ function renderAdminList() {
       editProject(b.dataset.id);
     })
   );
+  list.querySelectorAll(".btn-toggle").forEach((b) =>
+    b.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const id = b.dataset.id;
+      const p = projectsCache.find((x) => x.dbId === id);
+      if (!p) return;
+      const nextHidden = !p.hidden;
+      try {
+        await updateDoc(doc(db, "projects", id), { hidden: nextHidden });
+        await fetchProjectsFromDB();
+        renderAdminList();
+        showToast(nextHidden ? "✓ 숨김 처리되었습니다" : "✓ 공개 처리되었습니다");
+      } catch {
+        alert("저장 중 오류가 발생했습니다.");
+      }
+    })
+  );
   list.querySelectorAll(".btn-delete").forEach((b) =>
     b.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -727,6 +747,7 @@ function editProject(dbId) {
   $("fName").value = p.name || "";
   $("fTag").value = p.tag || "";
   setWorkCatsInForm(Array.isArray(p.workCats) ? p.workCats : ["UI/UX"]);
+  $("fHidden").checked = !!p.hidden;
   $("fYear").value = p.year || "";
   $("fClient").value = p.client || "";
   $("fSize").value = p.size || "normal";
@@ -821,6 +842,7 @@ function initSave() {
       name,
       tag,
       workCats,
+      hidden: $("fHidden").checked,
       year: $("fYear").value.trim(),
       client: $("fClient").value.trim(),
       size: $("fSize").value,

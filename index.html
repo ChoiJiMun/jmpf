@@ -338,7 +338,8 @@ async function fetchProjectsFromDB() {
       const mediaBlocks = Array.isArray(p.mediaBlocks) ? p.mediaBlocks : img.map(u => ({ type: 'image', url: u }));
       const embedUrls = Array.isArray(p.embedUrls) ? p.embedUrls : (p.embedUrl ? [p.embedUrl] : []);
       const customHtml = p.customHtml ? String(p.customHtml) : '';
-      return { ...p, images: img, mediaBlocks, embedUrls, customHtml, thumb: img[0] || thumb || '' };
+      const hidden = !!p.hidden;
+      return { ...p, hidden, images: img, mediaBlocks, embedUrls, customHtml, thumb: img[0] || thumb || '' };
     });
     return projects;
   } catch (e) {
@@ -430,7 +431,7 @@ async function renderProjects() {
     return;
   }
 
-  const filtered = projects.filter(p => matchWorkFilter(p, workFilter));
+  const filtered = projects.filter(p => !p.hidden).filter(p => matchWorkFilter(p, workFilter));
   if (!filtered.length) {
     grid.innerHTML = `<div style="grid-column:span 2;padding:120px;text-align:center;color:rgba(240,237,230,.2);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;">No projects in this category</div>`;
     return;
